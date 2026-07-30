@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Beauty Lab - 美妆开发工作台</title>
+<style>
+:root {
+  --bg: #faf8f5;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --sub: #6b7280;
+  --accent: #e84393;
+  --accent2: #6c5ce7;
+  --accent3: #00b894;
+  --accent4: #fdcb6e;
+  --accent5: #e17055;
+  --border: #f0ece6;
+  --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+  --nav-h: 64px;
+  --tab-h: 56px;
+}
+[data-theme="dark"] {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --text: #e8e8f0;
+  --sub: #9ca3af;
+  --border: #2a2a3e;
+  --shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Top Nav */
+.top-nav {
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.top-nav .logo {
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.top-nav .actions { display: flex; gap: 12px; align-items: center; }
+.top-nav .actions button {
+  background: none; border: none; font-size: 20px;
+  cursor: pointer; padding: 4px;
+  border-radius: 50%; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.top-nav .actions button:active { background: var(--border); }
+
+/* Date Bar */
+.date-bar {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.date-bar .date { font-size: 15px; font-weight: 600; }
+.date-bar .streak {
+  font-size: 13px; color: var(--accent);
+  background: rgba(232,67,147,0.1);
+  padding: 4px 12px; border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Scroll Area */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 100px;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* Sections */
+.section { margin-bottom: 20px; }
+.section-title {
+  font-size: 16px; font-weight: 700;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .icon { font-size: 20px; }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* ============ MODULE 1: 美妆资讯 ============ */
+.trend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.trend-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  text-align: center;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.trend-card:active { transform: scale(0.97); }
+.trend-card .platform {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 12px;
+  display: inline-block; margin-bottom: 8px;
+}
+.trend-card .platform.tiktok { background: #000; color: #fff; }
+.trend-card .platform.douyin { background: #fe2c55; color: #fff; }
+.trend-card .platform.xhs { background: #ff2442; color: #fff; }
+.trend-card .trend-title {
+  font-size: 13px; font-weight: 600; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; margin-bottom: 4px;
+}
+.trend-card .trend-meta {
+  font-size: 11px; color: var(--sub);
+}
+.trend-card .rank-badge {
+  position: absolute; top: -2px; right: -2px;
+  width: 28px; height: 28px;
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 0 0 0 12px;
+}
+
+.view-more {
+  display: block; text-align: center;
+  color: var(--accent2); font-size: 13px;
+  font-weight: 600; padding: 8px; cursor: pointer;
+  text-decoration: none;
+}
+
+/* ============ MODULE 2: 英语学习 ============ */
+.word-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0;
+}
+.word-card + .word-card { border-top: 1px solid var(--border); }
+.word-card .word-main { font-size: 20px; font-weight: 700; }
+.word-card .word-phonetic { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.word-card .word-meaning { font-size: 13px; color: var(--sub); margin-top: 2px; }
+.word-card .word-actions { display: flex; gap: 8px; }
+.word-card .word-actions button {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 14px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+}
+.word-card .word-actions button.done:active { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+
+/* Sentence cards */
+.sentence-card {
+  padding: 14px 0;
+  cursor: pointer;
+}
+.sentence-card + .sentence-card { border-top: 1px solid var(--border); }
+.sentence-card .sent-q {
+  font-size: 14px; font-weight: 600; line-height: 1.5;
+  color: var(--accent2); margin-bottom: 4px;
+}
+.sentence-card .sent-q-zh {
+  font-size: 12px; color: var(--sub); margin-bottom: 8px;
+}
+.sentence-card .sent-a {
+  font-size: 13px; line-height: 1.5; color: var(--text);
+  display: none; padding: 10px; background: rgba(0,184,148,0.06);
+  border-radius: 8px; margin-bottom: 6px;
+}
+.sentence-card.expanded .sent-a { display: block; }
+.sentence-card .sent-a-zh {
+  font-size: 12px; color: var(--sub); line-height: 1.5;
+  display: none; padding: 0 10px 10px;
+}
+.sentence-card.expanded .sent-a-zh { display: block; }
+.sentence-card .sent-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sentence-card .sent-actions { display: flex; gap: 6px; }
+.sentence-card .sent-actions button {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 12px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.sentence-card .sent-actions button.done-btn:active { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+
+.progress-row {
+  display: flex; gap: 10px; margin-top: 12px;
+}
+.progress-item {
+  flex: 1; text-align: center;
+  background: rgba(108,92,231,0.06);
+  border-radius: var(--radius-sm); padding: 12px 8px;
+}
+.progress-item .val { font-size: 22px; font-weight: 800; color: var(--accent2); }
+.progress-item .lbl { font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+/* ============ MODULE 3: AI 学习 ============ */
+.ai-level {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.ai-level .level-ring {
+  width: 64px; height: 64px; position: relative;
+}
+.ai-level .level-ring svg { transform: rotate(-90deg); }
+.ai-level .level-ring .center-text {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 800;
+}
+.ai-level .level-info h4 { font-size: 15px; margin-bottom: 4px; }
+.ai-level .level-info p { font-size: 12px; color: var(--sub); line-height: 1.4; }
+
+.ai-skills {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ai-skill-tag {
+  padding: 10px 12px; border-radius: 12px;
+  font-size: 12px; font-weight: 600; text-align: center;
+  background: rgba(0,184,148,0.1); color: var(--accent3);
+  border: 1px solid rgba(0,184,148,0.2);
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.ai-skill-tag:active { transform: scale(0.97); }
+.ai-skill-tag.locked { opacity: 0.5; background: rgba(107,114,128,0.08); color: var(--sub); border-color: var(--border); }
+.ai-skill-tag.learned { background: rgba(0,184,148,0.2); }
+
+/* AI skill detail */
+.ai-skill-detail {
+  margin-top: 12px; padding: 14px;
+  background: rgba(108,92,231,0.06); border-radius: 12px;
+  display: none;
+}
+.ai-skill-detail.active { display: block; animation: fadeIn 0.2s; }
+.ai-skill-detail .detail-header {
+  font-size: 15px; font-weight: 700; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.ai-skill-detail .detail-desc {
+  font-size: 12px; color: var(--sub); margin-bottom: 12px; line-height: 1.4;
+}
+.ai-subtopic {
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.ai-subtopic:last-child { border-bottom: none; }
+.ai-subtopic .sub-name {
+  font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+}
+.ai-subtopic .sub-desc {
+  font-size: 12px; color: var(--sub); margin-top: 2px; line-height: 1.4;
+}
+.ai-links { margin-top: 10px; }
+.ai-links a {
+  display: block; padding: 8px 12px; margin-bottom: 6px;
+  border-radius: 8px; background: var(--card);
+  color: var(--accent2); font-size: 12px; font-weight: 600;
+  text-decoration: none; border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.ai-links a:active { background: rgba(108,92,231,0.1); }
+.ai-daily-tip {
+  margin-top: 12px; padding: 12px;
+  background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(232,67,147,0.08));
+  border-radius: var(--radius-sm);
+  font-size: 13px; line-height: 1.5;
+}
+.ai-daily-tip .tip-label {
+  font-size: 11px; color: var(--accent2); font-weight: 700; margin-bottom: 4px;
+}
+
+/* ============ MODULE 4: 健康追踪 ============ */
+.health-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.health-item {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 14px 10px; text-align: center;
+  border: 1px solid var(--border);
+  cursor: pointer; position: relative;
+}
+.health-item .h-icon { font-size: 24px; margin-bottom: 6px; }
+.health-item .h-val { font-size: 20px; font-weight: 800; }
+.health-item .h-label { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.health-item .h-status {
+  width: 8px; height: 8px; border-radius: 50%;
+  position: absolute; top: 8px; right: 8px;
+}
+.health-item .h-status.good { background: var(--accent3); }
+.health-item .h-status.warn { background: var(--accent4); }
+.health-item .h-status.bad { background: var(--accent5); }
+
+.calorie-bar {
+  margin-top: 12px;
+}
+.calorie-bar .bar-label {
+  display: flex; justify-content: space-between;
+  font-size: 12px; margin-bottom: 6px;
+}
+.calorie-bar .bar-track {
+  height: 8px; border-radius: 4px; background: var(--border);
+  overflow: hidden;
+}
+.calorie-bar .bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent3), var(--accent4));
+  transition: width 0.5s;
+}
+
+/* ============ MODULE 5: 小红书电商 4阶段路线图 ============ */
+.ecom-phase-tabs {
+  display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+}
+.ecom-phase-tabs::-webkit-scrollbar { display: none; }
+.ecom-phase-tab {
+  flex-shrink: 0; padding: 8px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  white-space: nowrap; transition: all 0.2s; color: var(--text);
+}
+.ecom-phase-tab.active {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.ecom-phase-tab.done {
+  background: rgba(0,184,148,0.15); border-color: var(--accent3);
+  color: var(--accent3);
+}
+.ecom-phase-info {
+  font-size: 12px; color: var(--sub); margin-bottom: 12px;
+  padding: 8px 12px; background: rgba(108,92,231,0.06);
+  border-radius: 8px; line-height: 1.4;
+}
+.ecom-week-progress {
+  display: flex; gap: 4px; margin-bottom: 14px;
+}
+.ecom-day-dot {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: var(--border); transition: all 0.3s;
+}
+.ecom-day-dot.done { background: var(--accent3); }
+.ecom-day-dot.current { background: var(--accent); }
+
+.ecom-day-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+}
+.ecom-day-card .day-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.ecom-day-card .day-badge {
+  font-size: 11px; font-weight: 800; color: #fff;
+  background: var(--accent); padding: 3px 10px; border-radius: 12px;
+}
+.ecom-day-card .day-icon { font-size: 24px; }
+.ecom-day-card .day-title { font-size: 15px; font-weight: 700; flex: 1; }
+.ecom-day-card .day-goal {
+  font-size: 13px; color: var(--accent2);
+  background: rgba(108,92,231,0.08); padding: 8px 12px;
+  border-radius: 8px; margin-bottom: 12px; line-height: 1.4;
+}
+.ecom-task-list { list-style: none; margin-bottom: 12px; }
+.ecom-task-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0; font-size: 13px; line-height: 1.5;
+  cursor: pointer;
+}
+.ecom-task-list li .task-check {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.2s; margin-top: 1px;
+}
+.ecom-task-list li.done .task-check {
+  background: var(--accent3); border-color: var(--accent3); color: #fff;
+}
+.ecom-task-list li.done .task-text { text-decoration: line-through; color: var(--sub); }
+.ecom-tutorial {
+  font-size: 12px; color: var(--sub); line-height: 1.5;
+  padding: 10px 12px; background: rgba(253,203,110,0.12);
+  border-radius: 8px; margin-bottom: 10px;
+}
+.ecom-tutorial a {
+  display: inline-block; margin-top: 4px;
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(108,92,231,0.1); color: var(--accent2);
+  font-weight: 600; text-decoration: none; font-size: 12px;
+  transition: all 0.2s;
+}
+.ecom-tutorial a:active { background: rgba(108,92,231,0.2); }
+.ecom-checkpoint {
+  font-size: 12px; font-weight: 600;
+  padding: 10px 12px; background: rgba(0,184,148,0.1);
+  border-radius: 8px; color: var(--accent3);
+  display: flex; align-items: center; gap: 6px;
+}
+.ecom-nav {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.ecom-nav button {
+  flex: 1; padding: 10px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--card);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--text); transition: all 0.2s;
+}
+.ecom-nav button:active { background: var(--border); }
+.ecom-nav button.primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+
+/* Bottom Tab */
+.bottom-tabs {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: var(--tab-h);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 10;
+}
+.bottom-tabs .tab {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  cursor: pointer; padding: 4px 12px;
+  border-radius: 12px; transition: background 0.2s;
+}
+.bottom-tabs .tab.active { background: rgba(232,67,147,0.08); }
+.bottom-tabs .tab .tab-icon { font-size: 20px; }
+.bottom-tabs .tab .tab-label { font-size: 10px; font-weight: 600; color: var(--sub); }
+.bottom-tabs .tab.active .tab-label { color: var(--accent); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 100; display: flex; align-items: flex-end;
+  justify-content: center; animation: fadeIn 0.2s;
+}
+.modal-overlay.hidden { display: none; }
+.modal-content {
+  background: var(--card); border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 480px; max-height: 70vh;
+  overflow-y: auto; padding: 24px 20px;
+  animation: slideUp 0.3s ease;
+}
+.modal-content h3 { font-size: 18px; margin-bottom: 16px; }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--border); border: none; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+/* Toast */
+.toast {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+  background: #1a1a2e; color: #fff; padding: 10px 24px;
+  border-radius: 24px; font-size: 13px; font-weight: 600;
+  z-index: 200; animation: toastIn 0.3s, toastOut 0.3s 1.5s forwards;
+}
+@keyframes toastIn { from { opacity:0; transform: translateX(-50%) translateY(-10px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+@keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+/* Checklist in modal */
+.checklist { list-style: none; }
+.checklist li {
+  padding: 12px 0; display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px; cursor: pointer;
+}
+.checklist li .check-box {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 2px solid var(--border); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.checklist li.done .check-box {
+  background: var(--accent3); border-color: var(--accent3);
+  color: #fff;
+}
+.checklist li.done .check-text { text-decoration: line-through; color: var(--sub); }
+
+/* Water tracker */
+.water-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+.water-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid #74b9ff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all 0.2s;
+}
+.water-dot.filled { background: #74b9ff; color: #fff; }
+
+/* Food input */
+.food-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.food-input-row input {
+  flex: 1; padding: 10px 14px; border-radius: 20px;
+  border: 1px solid var(--border); font-size: 14px;
+  background: var(--card); color: var(--text); outline: none;
+}
+.food-input-row input:focus { border-color: var(--accent2); }
+.food-input-row button {
+  padding: 10px 20px; border-radius: 20px; border: none;
+  background: var(--accent3); color: #fff; font-weight: 700;
+  font-size: 14px; cursor: pointer;
+}
+
+.quick-add { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.quick-add .qa-btn {
+  padding: 6px 14px; border-radius: 14px; border: 1px solid var(--border);
+  background: var(--card); font-size: 12px; cursor: pointer;
+  color: var(--text);
+}
+.quick-add .qa-btn:active { background: var(--border); }
+
+.food-log { max-height: 160px; overflow-y: auto; }
+.food-log .food-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.food-log .food-row .del { color: var(--accent5); cursor: pointer; font-size: 16px; }
+
+/* English plan */
+.plan-phase {
+  padding: 12px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); margin-bottom: 8px;
+}
+.plan-phase .phase-header {
+  display: flex; justify-content: space-between;
+  font-weight: 700; margin-bottom: 4px;
+}
+.plan-phase .phase-tasks { font-size: 13px; color: var(--sub); }
+
+/* AI scene grid */
+.scene-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.scene-item {
+  padding: 10px; border-radius: var(--radius-sm);
+  background: rgba(108,92,231,0.06); font-size: 12px;
+  text-align: center; cursor: pointer; line-height: 1.4;
+}
+.scene-item .scene-emoji { font-size: 24px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="logo">💄 Beauty Lab</div>
+    <div class="actions">
+      <button onclick="toggleTheme()" title="深色模式">🌓</button>
+    </div>
+  </div>
+
+  <!-- Date Bar -->
+  <div class="date-bar">
+    <div class="date" id="dateDisplay"></div>
+    <div class="streak" id="streakDisplay">🔥 连续打卡 1 天</div>
+  </div>
+
+  <!-- Scroll Area -->
+  <div class="scroll-area" id="scrollArea">
+    <!-- Module 1: 美妆资讯 -->
+    <div class="section" id="sec-trends">
+      <div class="section-title"><span class="icon">🔥</span> 今日美妆资讯 · 爆款追踪</div>
+      <div class="trend-grid" id="trendGrid"></div>
+      <a class="view-more" onclick="openModal('trends')">查看完整 10 条 →</a>
+    </div>
+
+    <!-- Module 2: 英语学习 -->
+    <div class="section" id="sec-english">
+      <div class="section-title"><span class="icon">📖</span> 今日英语 · 单词打卡</div>
+      <div class="card">
+        <div id="wordCards"></div>
+        <div class="progress-row">
+          <div class="progress-item">
+            <div class="val" id="wordDone">0</div>
+            <div class="lbl">今日已学</div>
+          </div>
+          <div class="progress-item">
+            <div class="val" id="wordTotal">20</div>
+            <div class="lbl">今日目标</div>
+          </div>
+          <div class="progress-item">
+            <div class="val" id="wordStreak">0</div>
+            <div class="lbl">连续天数</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px;"><span class="icon">💬</span> 实用句型 · 美业沟通</div>
+      <div class="card" id="sentenceCard">
+        <div id="sentenceArea"></div>
+        <div class="progress-row">
+          <div class="progress-item">
+            <div class="val" id="sentDone">0</div>
+            <div class="lbl">今日已学</div>
+          </div>
+          <div class="progress-item">
+            <div class="val" id="sentTotal">10</div>
+            <div class="lbl">今日目标</div>
+          </div>
+          <div class="progress-item">
+            <div class="val" id="sentStreak">0</div>
+            <div class="lbl">连续天数</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 3: AI 学习 -->
+    <div class="section" id="sec-ai">
+      <div class="section-title"><span class="icon">🤖</span> AI 能力进阶 · 8D 掌握度</div>
+      <div class="card">
+        <div class="ai-level">
+          <div class="level-ring">
+            <svg width="64" height="64" viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" stroke-width="4"/>
+              <circle cx="32" cy="32" r="28" fill="none" stroke="var(--accent2)" stroke-width="4"
+                stroke-dasharray="175.93" stroke-dashoffset="105.56" stroke-linecap="round" id="aiRing"/>
+            </svg>
+            <div class="center-text" id="aiPercent">40%</div>
+          </div>
+          <div class="level-info">
+            <h4>阶段 3/8：生活应用探索</h4>
+            <p>目标：让 AI 融入理财、记账、饮食、运动、睡眠等日常</p>
+          </div>
+        </div>
+        <div class="ai-skills" id="aiSkills"></div>
+        <div class="ai-skill-detail" id="aiSkillDetail"></div>
+        <div class="ai-daily-tip" id="aiDailyTip"></div>
+      </div>
+    </div>
+
+    <!-- Module 4: 健康追踪 -->
+    <div class="section" id="sec-health">
+      <div class="section-title"><span class="icon">💪</span> 健康生活 · 今天有没有好好对自己</div>
+      <div class="health-grid">
+        <div class="health-item" onclick="openModal('diet')">
+          <div class="h-icon">🍽️</div>
+          <div class="h-val" id="calEaten">0</div>
+          <div class="h-label">已摄入 (kcal)</div>
+          <div class="h-status good"></div>
+        </div>
+        <div class="health-item" onclick="openModal('exercise')">
+          <div class="h-icon">🏃</div>
+          <div class="h-val" id="exerMin">0</div>
+          <div class="h-label">运动 (分钟)</div>
+          <div class="h-status" id="exerStatus"></div>
+        </div>
+        <div class="health-item" onclick="openModal('sleep')">
+          <div class="h-icon">😴</div>
+          <div class="h-val" id="sleepHr">--</div>
+          <div class="h-label">睡眠 (小时)</div>
+          <div class="h-status" id="sleepStatus"></div>
+        </div>
+        <div class="health-item" onclick="openModal('water')">
+          <div class="h-icon">💧</div>
+          <div class="h-val" id="waterCups">0</div>
+          <div class="h-label">饮水 (杯)</div>
+          <div class="h-status" id="waterStatus"></div>
+        </div>
+        <div class="health-item">
+          <div class="h-icon">⚖️</div>
+          <div class="h-val" id="energyGap">--</div>
+          <div class="h-label">能量缺口</div>
+          <div class="h-status good"></div>
+        </div>
+        <div class="health-item" onclick="openModal('period')">
+          <div class="h-icon">🩸</div>
+          <div class="h-val" id="periodDay">--</div>
+          <div class="h-label">姨妈周期</div>
+          <div class="h-status" id="periodStatus"></div>
+        </div>
+        <div class="health-item" onclick="openModal('selfcare')">
+          <div class="h-icon">💆</div>
+          <div class="h-val" id="selfCare">--</div>
+          <div class="h-label">自我关怀</div>
+          <div class="h-status" id="careStatus"></div>
+        </div>
+      </div>
+      <div class="calorie-bar" style="margin-top:12px;">
+        <div class="bar-label"><span>今日能量消耗</span><span id="calLabel">0 / 2000 kcal</span></div>
+        <div class="bar-track"><div class="bar-fill" id="calBar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Module 5: 小红书电商 4阶段路线图 -->
+    <div class="section" id="sec-ecom">
+      <div class="section-title"><span class="icon">🛍️</span> 小红书电商 · 全链路路线图</div>
+      <div class="ecom-phase-tabs" id="ecomPhaseTabs"></div>
+      <div class="ecom-phase-info" id="ecomPhaseInfo"></div>
+      <div class="ecom-week-progress" id="ecomProgress"></div>
+      <div id="ecomDayContent"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Tabs -->
+  <div class="bottom-tabs">
+    <div class="tab active" onclick="scrollToSection('trends')"><span class="tab-icon">🔥</span><span class="tab-label">资讯</span></div>
+    <div class="tab" onclick="scrollToSection('english')"><span class="tab-icon">📖</span><span class="tab-label">英语</span></div>
+    <div class="tab" onclick="scrollToSection('ai')"><span class="tab-icon">🤖</span><span class="tab-label">AI</span></div>
+    <div class="tab" onclick="scrollToSection('health')"><span class="tab-icon">💪</span><span class="tab-label">健康</span></div>
+    <div class="tab" onclick="scrollToSection('ecom')"><span class="tab-icon">🛍️</span><span class="tab-label">电商</span></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
+    <div style="position:relative;">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+const trendData = [
+  { platform:'xhs', title:'2024秋冬美拉德妆容教程 新手必学', views:'12.3w', rank:1 },
+  { platform:'douyin', title:'医用敷料怎么选？械字号面膜全攻略', views:'89.2w', rank:2 },
+  { platform:'tiktok', title:'Glass skin routine that dermatologists approve', views:'2.1M', rank:3 },
+  { platform:'xhs', title:'轻医美入门指南：光子嫩肤vs水光针怎么选', views:'45.6w', rank:4 },
+  { platform:'douyin', title:'成分党必看！2024美白精华成分红黑榜', views:'156w', rank:5 },
+  { platform:'tiktok', title:'Korean skincare 10-step routine explained', views:'5.3M', rank:6 },
+  { platform:'xhs', title:'化妆品备案新规解读 2024年最新变化', views:'23.1w', rank:7 },
+  { platform:'douyin', title:'械三类胶原蛋白敷料测评 修复力对比', views:'67.8w', rank:8 },
+  { platform:'tiktok', title:'Laser treatment before and after 30 days', views:'1.8M', rank:9 },
+  { platform:'xhs', title:'化妆品OEM/ODM代工厂怎么选 避坑指南', views:'34.2w', rank:10 },
+];
+
+const dailyWords = [
+  { word:'formulation', phonetic:'/ˌfɔːrmjuˈleɪʃn/', meaning:'配方；制剂' },
+  { word:'moisturizer', phonetic:'/ˈmɔɪstʃəraɪzər/', meaning:'保湿霜' },
+  { word:'dermatologist', phonetic:'/ˌdɜːrməˈtɑːlədʒɪst/', meaning:'皮肤科医生' },
+  { word:'collagen', phonetic:'/ˈkɑːlədʒən/', meaning:'胶原蛋白' },
+  { word:'sunscreen', phonetic:'/ˈsʌnskriːn/', meaning:'防晒霜' },
+  { word:'exfoliate', phonetic:'/eksˈfoʊlieɪt/', meaning:'去角质' },
+  { word:'serum', phonetic:'/ˈsɪrəm/', meaning:'精华液' },
+  { word:'hypoallergenic', phonetic:'/ˌhaɪpoʊælərˈdʒenɪk/', meaning:'低敏的' },
+  { word:'antioxidant', phonetic:'/ˌæntiˈɑːksɪdənt/', meaning:'抗氧化剂' },
+  { word:'emulsion', phonetic:'/ɪˈmʌlʃn/', meaning:'乳液' },
+  { word:'fragrance', phonetic:'/ˈfreɪɡrəns/', meaning:'香精' },
+  { word:'preservative', phonetic:'/prɪˈzɜːrvətɪv/', meaning:'防腐剂' },
+  { word:'regimen', phonetic:'/ˈredʒɪmən/', meaning:'护肤流程' },
+  { word:'toner', phonetic:'/ˈtoʊnər/', meaning:'爽肤水' },
+  { word:'essence', phonetic:'/ˈesns/', meaning:'精华' },
+  { word:'retinol', phonetic:'/ˈretɪnɔːl/', meaning:'视黄醇' },
+  { word:'hyaluronic', phonetic:'/ˌhaɪələˈrɑːnɪk/', meaning:'透明质酸的' },
+  { word:'niacinamide', phonetic:'/ˌnaɪəˈsɪnəmaɪd/', meaning:'烟酰胺' },
+  { word:'peptide', phonetic:'/ˈpeptaɪd/', meaning:'胜肽' },
+  { word:'ceramide', phonetic:'/sɪˈræmaɪd/', meaning:'神经酰胺' },
+];
+
+const dailySentences = [
+  {
+    q: "What are the main active ingredients in this product?",
+    a: "The key active ingredients are niacinamide for brightening, hyaluronic acid for hydration, and peptides for anti-aging.",
+    qzh: "这个产品的主要活性成分是什么？",
+    azh: "主要活性成分包括用于美白的烟酰胺、用于补水的透明质酸，以及用于抗老的胜肽。"
+  },
+  {
+    q: "What does this serum do for your skin?",
+    a: "This serum helps reduce fine lines, even out skin tone, and boost collagen production for firmer skin.",
+    qzh: "这款精华对皮肤有什么功效？",
+    azh: "这款精华有助于减少细纹、均匀肤色，并促进胶原蛋白生成，让皮肤更紧致。"
+  },
+  {
+    q: "Is this product suitable for sensitive skin?",
+    a: "Yes, it's hypoallergenic and fragrance-free. It has been dermatologist-tested for sensitive skin.",
+    qzh: "这个产品适合敏感肌吗？",
+    azh: "是的，它是低敏配方且不含香精，已经过皮肤科医生测试，适合敏感肌。"
+  },
+  {
+    q: "How long does it take to see results?",
+    a: "Most users notice visible improvement within 4 to 6 weeks of consistent use, twice daily.",
+    qzh: "用多久能看到效果？",
+    azh: "大多数用户在坚持每天使用两次、持续4到6周后，会看到明显改善。"
+  },
+  {
+    q: "What's the difference between a toner and an essence?",
+    a: "A toner balances pH and removes residue, while an essence delivers concentrated active ingredients deeper into the skin.",
+    qzh: "爽肤水和精华有什么区别？",
+    azh: "爽肤水用来平衡pH值和清除残留，而精华则将浓缩活性成分输送到皮肤深层。"
+  },
+  {
+    q: "Can I use retinol and vitamin C together?",
+    a: "It's not recommended to use them at the same time. Use vitamin C in the morning and retinol at night for best results.",
+    qzh: "视黄醇和维C可以一起用吗？",
+    azh: "不建议同时使用。建议早上用维C、晚上用视黄醇，效果最佳。"
+  },
+  {
+    q: "What SPF level do you recommend for daily use?",
+    a: "I recommend at least SPF 30 for daily use, and SPF 50 if you're outdoors for extended periods.",
+    qzh: "日常防晒你推荐多少倍？",
+    azh: "日常建议至少SPF30，如果长时间户外活动建议SPF50。"
+  },
+  {
+    q: "How should I layer my skincare products?",
+    a: "Apply from thinnest to thickest: cleanser → toner → serum → moisturizer → sunscreen in the morning.",
+    qzh: "护肤品应该按什么顺序涂抹？",
+    azh: "从薄到厚：洁面 → 爽肤水 → 精华 → 面霜 → 防晒（早上）。"
+  },
+  {
+    q: "What's the shelf life of this cosmetic product?",
+    a: "Unopened, it lasts 3 years. Once opened, please use within 12 months — you'll find the PAO symbol on the packaging.",
+    qzh: "这个化妆品的保质期是多久？",
+    azh: "未开封保质期3年。开封后请在12个月内用完——包装上可以找到PAO标志。"
+  },
+  {
+    q: "Could you explain the formulation approach behind this moisturizer?",
+    a: "It uses a lamellar emulsion structure that mimics the skin's natural lipid barrier, providing long-lasting hydration without feeling greasy.",
+    qzh: "能解释一下这款面霜的配方思路吗？",
+    azh: "它采用了层状乳液结构，模拟皮肤的天然脂质屏障，提供持久保湿且不油腻。"
+  },
+];
+
+const ecomPhases = [
+  {
+    id: 1,
+    name: '前期准备',
+    icon: '🏗️',
+    color: 'var(--accent)',
+    desc: '账号搭建 · 选品 · 内容创作 · 投流验证',
+    days: [
+      {
+        day: 1, title: '平台认知与账号搭建', icon: '🏗️',
+        goal: '搞清小红书电商底层逻辑，搭建能带货的账号地基',
+        tasks: [
+          '注册/优化账号：昵称+简介突出美妆专业人设（如"XX｜美妆开发师"）',
+          '完成专业号认证（个人/企业），开通店铺或带货权限',
+          '拆解 3 个同类对标账号：记录他们的昵称、简介、头像、内容方向',
+          '梳理自己账号定位：目标人群是谁？解决什么问题？差异化在哪？',
+        ],
+        tutorial: '🔍 搜索关键词"美妆博主账号搭建"，重点看近 3 个月点赞>1000 的笔记',
+        links: [
+          { title:'小红书起号赚钱攻略（收藏篇）', url:'https://www.bilibili.com/opus/813040388889640965' },
+          { title:'0经验起号干货运营攻略', url:'https://www.sohu.com/a/989278634_121979483' },
+        ],
+        checkpoint: '账号资料完整 + 写出 1 句话定位',
+      },
+      {
+        day: 2, title: '选品与爆款逻辑', icon: '🎯',
+        goal: '学会选对品，找到有流量又有利润的产品方向',
+        tasks: [
+          '用小红书搜索框输入"美妆推荐"，记录下拉推荐词（这些就是用户需求）',
+          '在"千瓜数据"或"蝉小红"查近 7 天美妆热门品类 TOP10',
+          '选 1-3 个主打产品，分析竞品笔记的封面、标题、卖点话术',
+          '列出每个产品的 3 个核心卖点和 1 个差异化标签',
+        ],
+        tutorial: '📺 B站搜"小红书选品方法论 2024"，看播放量最高的 2-3 个视频',
+        links: [
+          { title:'小红书选品方法论，看完就会！', url:'https://www.woshipm.com/operate/5963467.html' },
+          { title:'小红书选品方法论 - 知乎', url:'https://zhuanlan.zhihu.com/p/673468103' },
+        ],
+        checkpoint: '确定 1-3 个主推品 + 每个产品写出卖点清单',
+      },
+      {
+        day: 3, title: '爆款笔记创作（图文）', icon: '📝',
+        goal: '掌握图文笔记的爆款公式，写出能引流的测评笔记',
+        tasks: [
+          '学习爆款标题公式：数字+痛点+结果（如"3款平价精华测评｜干皮亲测不踩雷"）',
+          '写 1 篇产品测评笔记：封面图+5-8张产品图+使用感受+成分分析',
+          '笔记末尾加 CTA 引导："想看更多美妆测评记得关注～"',
+          '发布时间选 12:00-13:00 或 20:00-22:00（用户活跃高峰）',
+        ],
+        tutorial: '📖 小红书搜"笔记排版教程"，看封面设计+正文结构拆解',
+        links: [
+          { title:'爆款笔记核心公式', url:'https://www.bilibili.com/video/BV1DvK86pEN6/' },
+          { title:'手把手教你批量打造爆文笔记', url:'https://www.bilibili.com/opus/670079619091660836' },
+        ],
+        checkpoint: '发布 1 篇图文笔记',
+      },
+      {
+        day: 4, title: '短视频制作入门', icon: '🎬',
+        goal: '学会拍一条能带货的 30-60 秒美妆短视频',
+        tasks: [
+          '写 1 条视频脚本：前3秒痛点钩子→产品展示→使用过程→效果对比→引导互动',
+          '用手机拍摄：自然光+素颜出镜更有真实感，产品特写要清晰',
+          '剪辑用"剪映"App：加字幕、加热门BGM、节奏控制在30-60秒',
+          '发布后 1 小时内积极回复评论，提升互动率',
+        ],
+        tutorial: '📺 B站搜"小红书短视频剪辑教程 剪映"，看实操类视频',
+        links: [
+          { title:'剪映全套教程：手机版零基础入门', url:'https://www.bilibili.com/video/BV1GCthzaEEP/' },
+          { title:'剪映全套教程：电脑版从入门到精通', url:'https://www.bilibili.com/video/BV1N7G3z9E5g/' },
+        ],
+        checkpoint: '发布 1 条短视频笔记',
+      },
+      {
+        day: 5, title: '投流与推广（薯条+聚光）', icon: '🚀',
+        goal: '学会用小预算测试笔记潜力，放大爆款',
+        tasks: [
+          '了解"薯条推广"（加热笔记）和"聚光平台"（搜索广告）的区别',
+          '选昨天/前天发布的数据最好的笔记，投 100-300 元薯条测试',
+          '定向设置：女性+25-35岁+美妆兴趣人群',
+          '投放 6 小时后看数据：点击率>5% 继续加投，<3% 优化封面标题',
+        ],
+        tutorial: '📺 B站搜"小红书薯条投放技巧 2024"或"聚光平台入门"',
+        links: [
+          { title:'小红书聚光平台广告投放操作步骤', url:'https://business.sohu.com/a/737939183_100264229' },
+          { title:'小红书聚光投放步骤详解', url:'https://www.sohu.com/a/800223448_100037848' },
+        ],
+        checkpoint: '完成 1 次薯条投放 + 记录数据',
+      },
+      {
+        day: 6, title: '达人合作与私域引流', icon: '🤝',
+        goal: '学会借力达人带货，把流量沉淀到私域',
+        tasks: [
+          '在蒲公英平台筛选 3-5 个腰尾部达人（粉丝 1w-10w，美妆垂类）',
+          '给达人发合作邀约：产品+佣金+Brief（内容要求）',
+          '笔记中设置引流钩子："评论区扣1发攻略"或"私信领优惠券"',
+          '把互动用户引流到微信/社群，做复购和私域运营',
+        ],
+        tutorial: '📖 小红书搜"蒲公英平台入驻教程"或"达人合作Brief模板"',
+        links: [
+          { title:'小红书蒲公英（官方帮助中心）', url:'https://pgy.xiaohongshu.com/help/home' },
+          { title:'蒲公英达人合作流程及教程', url:'https://zhuanlan.zhihu.com/p/563729081' },
+        ],
+        checkpoint: '联系 3 个达人 + 设计 1 个引流钩子',
+      },
+      {
+        day: 7, title: '数据复盘与迭代', icon: '📊',
+        goal: '用数据指导下一周的内容和投放策略',
+        tasks: [
+          '打开小红书创作中心，导出本周所有笔记数据',
+          '分析每篇笔记：曝光→点击→互动→收藏的转化漏斗',
+          '找出数据最好的 1 篇笔记，总结它为什么火（标题？封面？话题？）',
+          '制定下周计划：复制爆款方向 x3 + 新测试方向 x1',
+        ],
+        tutorial: '📺 B站搜"小红书数据分析复盘"或"千瓜数据使用教程"',
+        links: [
+          { title:'小红书复盘怎么做才能让数据优化', url:'https://zhuanlan.zhihu.com/p/675126097' },
+          { title:'小红书投放高效复盘这样做', url:'https://zhuanlan.zhihu.com/p/670308011' },
+        ],
+        checkpoint: '完成 1 份周度复盘 + 下周内容计划表',
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: '供应链搭建',
+    icon: '🏭',
+    color: 'var(--accent2)',
+    desc: '找工厂 · 谈代工 · 备案合规 · 物流仓储',
+    days: [
+      {
+        day: 1, title: '代工厂筛选与对接', icon: '🏭',
+        goal: '找到能稳定生产、资质齐全的代工厂',
+        tasks: [
+          '明确产品需求：品类（护肤/彩妆/器械）、起订量、预算、功效定位',
+          '在1688/展会/行业群筛选 5-8 家代工厂，查营业执照和生产资质',
+          '发询价函：包含配方需求、包装要求、起订量、交期、价格目标',
+          '对比 3 家以上工厂的报价单：代工费+包材费+备案费+起订量',
+        ],
+        tutorial: '📺 B站搜"化妆品OEM代工怎么选厂"或"美妆供应链对接"',
+        links: [
+          { title:'如何选择化妆品OEM工厂？完整选厂指南', url:'https://www.8oem.com/ai/zh/guides/how-to-choose-oem-factory.html' },
+          { title:'一篇看懂化妆品OEM全流程', url:'https://zhuanlan.zhihu.com/p/1997237527749362926' },
+        ],
+        checkpoint: '筛选出 3 家意向工厂 + 完成初步报价对比',
+      },
+      {
+        day: 2, title: '配方开发与打样', icon: '🧪',
+        goal: '推进配方打样，确认产品功效和稳定性',
+        tasks: [
+          '与工厂研发沟通配方方向：核心成分、功效诉求、肤感、香型',
+          '要求打 2-3 版样品，每版标注配方差异和功效侧重点',
+          '收到样品后做内测：上脸测试、肤感评分、稳定性观察（耐寒/耐热）',
+          '选定价样版本，提出微调意见（如增稠、调香、调整pH值）',
+        ],
+        tutorial: '📖 小红书搜"化妆品配方开发流程"或"打样测试注意事项"',
+        links: [
+          { title:'化妆品开发流程及配方设计原则', url:'https://zhuanlan.zhihu.com/p/98475530' },
+          { title:'化妆品开发流程超详细知识分享', url:'https://zhuanlan.zhihu.com/p/368717181' },
+        ],
+        checkpoint: '收到样品 + 完成 1 轮内测反馈',
+      },
+      {
+        day: 3, title: '包材采购与设计', icon: '📦',
+        goal: '搞定包装设计，确保包材质量和供应链稳定',
+        tasks: [
+          '确定包材类型：瓶器（亚克力/玻璃/PE）、软管、喷头、外盒',
+          '找包材供应商对比 3 家：单价、起订量、交期、模具费',
+          '完成包装视觉设计：logo、瓶贴、外盒、说明书（可找设计师或用AI辅助）',
+          '确认包材与内容物兼容性：不会发生化学反应或渗漏',
+        ],
+        tutorial: '📺 B站搜"化妆品包材选择"或"美妆包装设计流程"',
+        links: [
+          { title:'从专业角度看化妆品包材怎么选', url:'https://zhuanlan.zhihu.com/p/556481169' },
+          { title:'化妆品加工厂如何挑选包材', url:'https://www.mycoem.com/news_de/18.html' },
+        ],
+        checkpoint: '包材方案确定 + 设计稿出图',
+      },
+      {
+        day: 4, title: '备案与合规', icon: '📋',
+        goal: '完成产品备案，确保合法合规上市',
+        tasks: [
+          '确认产品分类：普通化妆品（省局备案）vs 特殊化妆品/械字号（国家局注册）',
+          '准备备案资料：配方表、产品说明书、检验报告、安全评估报告',
+          '送检：微生物+重金属+功效评价（如有宣称需对应检测）',
+          '通过工厂或代理机构提交备案，跟踪审批进度（普通妆通常 5-15 工作日）',
+        ],
+        tutorial: '📖 国家药监局官网查"化妆品备案指南"或搜"NMPA备案流程 2024"',
+        links: [
+          { title:'化妆品NMPA注册备案全流程解析', url:'https://www.nmpa-cn.com/china-cosmetics-registration-guide/' },
+          { title:'中国化妆品注册与备案怎么操作', url:'https://www.sohu.com/a/1030813929_121824620' },
+        ],
+        checkpoint: '备案资料提交 + 获得备案号',
+      },
+      {
+        day: 5, title: '物流仓储搭建', icon: '🚚',
+        goal: '建立发货能力，确保订单能及时发出',
+        tasks: [
+          '选择仓储模式：自仓（成本低但费人力）vs 云仓（省心但单价高）',
+          '对比 2-3 家快递：三通一达/极兔/顺丰，谈阶梯价（量大更便宜）',
+          '确定发货流程：打单→拣货→打包→贴单→揽收，估算日发货能力',
+          '设置退换货流程：退货地址、质检标准、退款时效',
+        ],
+        tutorial: '📺 B站搜"电商仓储物流怎么搭"或"小红书店铺发货流程"',
+        links: [
+          { title:'电商库存管理一站式仓储流程设计', url:'https://www.flowportal.com/blogs/e-commerce-inventory-management-system/ecommerce-warehouse-management-workflow' },
+          { title:'电商仓库搭建清单照着抄就行', url:'https://www.sohu.com/a/1021109011_121484165' },
+        ],
+        checkpoint: '确定仓库+快递方案 + 跑通发货流程',
+      },
+      {
+        day: 6, title: '首批生产与质检', icon: '✅',
+        goal: '完成首批大货生产，确保品质达标',
+        tasks: [
+          '确认大货生产订单：数量、交期、付款方式（通常30%定金+70%尾款）',
+          '生产中跟进度：料体生产→灌装→包装→贴标，关键节点拍照确认',
+          '大货到仓后抽检：外观、密封性、灌装量、PH值、微生物指标',
+          '不合格批次及时与工厂沟通处理方案（退换/补货/折价）',
+        ],
+        tutorial: '📖 小红书搜"化妆品大货质检标准"或"OEM验厂注意事项"',
+        links: [
+          { title:'揭秘工厂的品控质检流程', url:'https://www.sohu.com/a/992289927_122644858' },
+          { title:'化妆品验货标准与方法', url:'https://zhuanlan.zhihu.com/p/678055280' },
+        ],
+        checkpoint: '首批大货入库 + 抽检合格',
+      },
+      {
+        day: 7, title: '上架与供应链复盘', icon: '📊',
+        goal: '产品正式上架，复盘供应链全流程',
+        tasks: [
+          '小红书店铺上架产品：标题、详情页、价格、库存、运费模板',
+          '设置促销活动：新品首发价/满减/赠品策略',
+          '复盘供应链全流程：耗时、成本、问题点、优化方向',
+          '建立供应链SOP文档：从选厂到发货的标准流程，方便复制',
+        ],
+        tutorial: '📺 B站搜"小红书店铺上架教程"或"电商供应链管理"',
+        links: [
+          { title:'小红书店铺开店教程(保姆级)商品上架', url:'https://www.bilibili.com/list/3546853830298333?oid=114056815968689&bvid=BV1bQAReqEkj' },
+          { title:'小红书怎么开店？手把手小白教程', url:'https://www.bilibili.com/opus/792535948721127442' },
+        ],
+        checkpoint: '产品正式上架 + 完成 1 份供应链SOP',
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: '运营增长',
+    icon: '📈',
+    color: 'var(--accent3)',
+    desc: '日常上新 · 活动大促 · 复购运营 · 数据驱动',
+    days: [
+      {
+        day: 1, title: '内容日历与持续上新', icon: '📅',
+        goal: '建立稳定的内容输出节奏，持续吸引流量',
+        tasks: [
+          '制定 4 周内容日历：每周 3-5 条笔记（测评+教程+种草+日常穿插）',
+          '每 2-3 周上 1 款新品，保持用户新鲜感和店铺活跃度',
+          '建立内容素材库：产品图、使用场景图、成分图、前后对比图',
+          '固定发布时间：工作日 12:00/20:00，周末 10:00/21:00',
+        ],
+        tutorial: '📖 小红书搜"内容日历怎么做"或"美妆博主更新频率"',
+        links: [
+          { title:'用AI自动管理小红书内容日历', url:'https://cloud.tencent.com/developer/article/2654527' },
+          { title:'日历规划法：批量策划季度内容', url:'https://www.toutiao.com/article/7588240472368251401/' },
+        ],
+        checkpoint: '完成 4 周内容日历 + 建立素材库',
+      },
+      {
+        day: 2, title: '活动大促策划', icon: '🎉',
+        goal: '学会策划促销活动，提升单场GMV',
+        tasks: [
+          '了解小红书大促节点：38节、618、双11、年货节等',
+          '策划 1 场新品首发活动：早鸟价+限量赠品+前N名加码',
+          '提前 7 天预热：发预告笔记、达人种草、社群预告',
+          '活动当天集中爆发：直播+笔记+投流+社群同步推',
+        ],
+        tutorial: '📺 B站搜"小红书大促活动策划"或"电商营销节奏"',
+        links: [
+          { title:'小红书618大促直播运营指南', url:'https://www.toutiao.com/article/7505319796612678144/' },
+          { title:'2025小红书双11新商大促营销策略', url:'https://www.sohu.com/a/951418012_122020073' },
+        ],
+        checkpoint: '完成 1 场活动策划方案 + 预热排期',
+      },
+      {
+        day: 3, title: '直播带货入门', icon: '🎥',
+        goal: '开通直播能力，用直播提升转化',
+        tasks: [
+          '开通小红书直播权限，完成直播间装修（背景/灯光/产品陈列）',
+          '准备直播脚本：开场→产品介绍→试用展示→限时优惠→互动答疑',
+          '首次直播 1-2 小时，重点跑通流程，不追求高GMV',
+          '直播后复盘：观看人数、停留时长、转化率、互动率',
+        ],
+        tutorial: '📺 B站搜"小红书直播怎么开"或"美妆直播话术技巧"',
+        links: [
+          { title:'小红书怎么直播卖货：从0到1打造爆款直播间', url:'https://www.bilibili.com/opus/1064008487538786313' },
+          { title:'小红书直播带货攻略：全流程指南', url:'https://zhuanlan.zhihu.com/p/1951596333896036520' },
+        ],
+        checkpoint: '完成 1 场直播 + 复盘数据',
+      },
+      {
+        day: 4, title: '复购与私域运营', icon: '🔁',
+        goal: '提升老客复购率，把流量变留存',
+        tasks: [
+          '建立私域社群（微信群）：购买用户邀请入群，享专属优惠',
+          '设计复购机制：会员积分、老客券、空瓶回收、周期购',
+          '社群日常运营：每日早安+护肤小知识+产品种草+互动抽奖',
+          '分析复购数据：30天/60天/90天复购率，找出高价值用户',
+        ],
+        tutorial: '📖 小红书搜"私域运营怎么做"或"美妆复购策略"',
+        links: [
+          { title:'私域运营中的复购策略与实践', url:'https://zhuanlan.zhihu.com/p/689748724' },
+          { title:'如何通过私域促进复购：实操与案例', url:'https://www.cnblogs.com/youzan/articles/19053124' },
+        ],
+        checkpoint: '建立 1 个社群 + 设计 1 套复购机制',
+      },
+      {
+        day: 5, title: '评价管理与口碑维护', icon: '⭐',
+        goal: '管理好用户评价，维护品牌口碑',
+        tasks: [
+          '每天查看店铺评价和笔记评论，及时回复（好的感谢，差的中立回应）',
+          '差评处理：联系用户了解问题→提供退换/补偿→记录改进',
+          '引导好评：包裹里放感谢卡+"晒图返现/送小样"引导',
+          '监控全网口碑：小红书搜品牌名，看有没有负面笔记需要处理',
+        ],
+        tutorial: '📖 搜"小红书评价管理"或"电商口碑维护技巧"',
+        links: [
+          { title:'小红书评论操作步骤详解', url:'https://www.sohu.com/a/867686940_122307090' },
+          { title:'如何有效管理小红书企业号评论区', url:'https://300004559.b2b.11467.com/m/news/10902842.asp' },
+        ],
+        checkpoint: '建立评价回复SOP + 差评处理流程',
+      },
+      {
+        day: 6, title: '竞品监控与差异化', icon: '🔍',
+        goal: '持续盯竞品，保持自己的差异化优势',
+        tasks: [
+          '列出 5 个直接竞品，每周查看他们的新品、价格、活动',
+          '记录竞品爆款笔记：标题、封面、卖点、评论区高频问题',
+          '找差异化机会：竞品没覆盖的成分、肤质、价位段、使用场景',
+          '每月做 1 次竞品分析报告，指导自己下一步产品规划',
+        ],
+        tutorial: '📖 千瓜/蝉小红查竞品数据，或搜"小红书竞品分析"',
+        links: [
+          { title:'小红书竞品分析实战指南', url:'https://www.woshipm.com/share/6150683.html' },
+          { title:'小红书竞品分析实战指南 - 知乎', url:'https://zhuanlan.zhihu.com/p/12716364584' },
+        ],
+        checkpoint: '完成 1 份竞品分析报告',
+      },
+      {
+        day: 7, title: '月度复盘与增长规划', icon: '📊',
+        goal: '全盘复盘本月经营数据，规划下月增长',
+        tasks: [
+          '导出月度数据：GMV、订单量、客单价、复购率、ROI',
+          '分析内容ROI：哪类笔记带货最多？投流ROI多少？',
+          '分析产品ROI：哪个SKU卖最好？哪个需要清库存？',
+          '制定下月目标：GMV目标+内容计划+上新计划+投流预算',
+        ],
+        tutorial: '📺 B站搜"小红书电商月度复盘"或"电商数据分析方法"',
+        links: [
+          { title:'小红书电商数据如何高效复盘', url:'https://zhuanlan.zhihu.com/p/1942224366189406147' },
+          { title:'3000家品牌都在用的小红书投放复盘', url:'https://www.sohu.com/a/908053689_121373394' },
+        ],
+        checkpoint: '完成月度复盘报告 + 下月增长计划',
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: '自动化与规模化',
+    icon: '🤖',
+    color: 'var(--accent4)',
+    desc: 'AI客服 · AI内容 · ERP系统 · 团队搭建',
+    days: [
+      {
+        day: 1, title: 'AI客服与自动回复', icon: '💬',
+        goal: '用AI处理常见咨询，降低客服人力成本',
+        tasks: [
+          '梳理高频客服问题：产品功效、使用方法、发货时效、退换货规则',
+          '用AI（如ChatGPT/扣子）搭建自动回复知识库，输入产品FAQ',
+          '配置小红书私信自动回复：关键词触发自动回复+转人工兜底',
+          '测试AI回复准确率，持续优化话术和知识库',
+        ],
+        tutorial: '📺 B站搜"扣子Coze搭建客服机器人"或"小红书自动回复设置"',
+        links: [
+          { title:'使用扣子Coze搭建AI客服机器人', url:'https://zhuanlan.zhihu.com/p/14399669219' },
+          { title:'零基础用Coze搭建微信客服机器人', url:'https://zhuanlan.zhihu.com/p/1022744101' },
+        ],
+        checkpoint: 'AI客服上线 + 覆盖 80% 常见问题',
+      },
+      {
+        day: 2, title: 'AI内容批量生产', icon: '✍️',
+        goal: '用AI辅助内容创作，提升笔记产出效率',
+        tasks: [
+          '用AI生成笔记标题：输入产品卖点+目标人群，批量出 10 个标题',
+          '用AI写笔记正文：给模板（测评/种草/教程），AI填充内容框架',
+          '用AI做竞品分析：把竞品笔记喂给AI，总结爆款规律',
+          '建立AI内容SOP：人工定方向→AI出初稿→人工润色→发布',
+        ],
+        tutorial: '📺 B站搜"AI写小红书笔记"或"ChatGPT做美妆内容"',
+        links: [
+          { title:'用ChatGPT写80分小红书笔记实战演示', url:'https://zhuanlan.zhihu.com/p/622838480' },
+          { title:'用AI发小红书笔记30分钟出爆款', url:'https://www.sohu.com/a/990639857_121971377' },
+        ],
+        checkpoint: '用AI产出 5 篇笔记初稿 + 建立内容SOP',
+      },
+      {
+        day: 3, title: 'AI图像与设计辅助', icon: '🎨',
+        goal: '用AI生成产品图和营销素材，降低设计成本',
+        tasks: [
+          '用AI（Midjourney/通义万相）生成产品场景图、氛围图',
+          '用AI做封面图设计：输入主题，AI出多版封面备选',
+          '用AI修图：批量处理产品图（去背景、调色、加文字）',
+          '建立素材库：AI生成+实拍图分类管理，方便复用',
+        ],
+        tutorial: '📺 B站搜"AI生成产品图"或"Midjourney美妆设计"',
+        links: [
+          { title:'Midjourney教程：AI制作电商主图全流程', url:'https://www.bilibili.com/video/BV1wGZmYWEQG/' },
+          { title:'AI一键生成高级电商效果图', url:'https://www.bilibili.com/video/BV1g242eGES5/' },
+        ],
+        checkpoint: '用AI产出 10 张可用素材 + 建立素材库',
+      },
+      {
+        day: 4, title: 'ERP与进销存系统', icon: '📊',
+        goal: '用系统管理订单、库存、财务，告别手工记账',
+        tasks: [
+          '选择ERP工具：聚水潭/旺店通/店小秘（适合电商中小卖家）',
+          '打通小红书店铺→ERP：订单自动同步，打单发货一体化',
+          '设置库存预警：低于安全库存自动提醒补货',
+          '用ERP生成财务报表：日报/周报/月报，自动统计利润',
+        ],
+        tutorial: '📺 B站搜"聚水潭ERP教程"或"小红书ERP对接"',
+        links: [
+          { title:'聚水潭ERP基础培训视频', url:'https://www.bilibili.com/list/ml3344282197?oid=673756906&bvid=BV1hU4y1G7Zx' },
+          { title:'聚水潭电商新手实操入门', url:'https://www.bilibili.com/cheese/play/ss673558573' },
+        ],
+        checkpoint: 'ERP系统上线 + 订单自动流转',
+      },
+      {
+        day: 5, title: '数据分析自动化', icon: '🤖',
+        goal: '用AI+工具自动化数据分析，每天看数据不费力',
+        tasks: [
+          '用千瓜/蝉小红设置竞品监控，自动推送竞品动态',
+          '用AI写数据分析脚本：自动统计笔记互动率、转化率、ROI',
+          '搭建数据看板：核心指标（GMV/订单/复购/ROI）一目了然',
+          '设置异常告警：ROI下降/差评增多/库存不足自动通知',
+        ],
+        tutorial: '📺 B站搜"电商数据看板搭建"或"千瓜数据自动监控"',
+        links: [
+          { title:'BI实战案例：销售数据分析看板', url:'https://www.bilibili.com/cheese/play/ep1095250' },
+          { title:'从0到1建Power BI销售数据看板', url:'https://www.bilibili.com/list/ml3544446699?oid=577881960&bvid=BV1Hz4y1N7NH' },
+        ],
+        checkpoint: '数据看板上线 + 设置 3 个告警规则',
+      },
+      {
+        day: 6, title: '团队搭建与SOP', icon: '👥',
+        goal: '把个人作战升级为团队协作，建立标准流程',
+        tasks: [
+          '梳理需要人的岗位：内容/投放/客服/供应链/直播',
+          '优先外包或招 1-2 个核心岗（如内容运营+客服）',
+          '为每个岗位写SOP文档：做什么、怎么做、做到什么标准',
+          '建立协作机制：每日站会（15分钟）+周复盘（1小时）',
+        ],
+        tutorial: '📖 搜"电商团队搭建"或"小团队SOP怎么做"',
+        links: [
+          { title:'电商运营搭建SOP的五大实战要素', url:'https://blog.csdn.net/2301_78368467/article/details/144425592' },
+          { title:'如何搭建并落实营销项目的SOP', url:'https://www.aiyingli.com/82966.html' },
+        ],
+        checkpoint: '完成岗位SOP + 招聘/外包 1 个岗位',
+      },
+      {
+        day: 7, title: '全链路复盘与放大', icon: '🚀',
+        goal: '复盘4个阶段全流程，制定规模化放大策略',
+        tasks: [
+          '全盘复盘：从账号搭建→供应链→运营→自动化，4阶段耗时和成果',
+          '找出瓶颈环节：是流量不够？产能不足？复购太低？还是效率太低？',
+          '制定放大计划：加预算投流？扩品类？招人？上自动化？',
+          '建立"增长飞轮"模型：内容→流量→转化→复购→数据→内容，持续循环',
+        ],
+        tutorial: '📖 搜"电商增长飞轮"或"规模化增长策略"',
+        links: [
+          { title:'飞轮效应模型深度研究：搭建和设计', url:'https://zhuanlan.zhihu.com/p/447762805' },
+          { title:'私域公域联动流量飞轮模型', url:'https://www.hwds868.com/article/private-domain-public-domain-flywheel-model.html' },
+        ],
+        checkpoint: '完成全链路复盘 + 增长飞轮模型',
+      },
+    ],
+  },
+];
+
+const ai8D = [
+  {
+    id:1, name:'基础对话', icon:'💬', learned:true,
+    desc:'掌握 Prompt 提示词技巧，让 AI 准确理解你的需求',
+    subtopics: [
+      { name:'Prompt 提示词工程', desc:'学会写结构化提示词：角色+任务+约束+输出格式' },
+      { name:'ChatGPT 使用入门', desc:'注册、基本对话、多轮对话上下文管理' },
+      { name:'AI 提问的艺术', desc:'如何追问、拆解复杂问题、让AI给高质量回答' },
+      { name:'常见 AI 工具对比', desc:'ChatGPT vs Kimi vs 文心一言 vs 通义千问，各自擅长什么' },
+    ],
+    links: [
+      { title:'ChatGPT Prompt提示词工程 基础到进阶', url:'https://www.bilibili.com/opus/887119417621610534' },
+      { title:'ChatGPT使用全攻略：16个技巧效率提升10倍', url:'https://zhuanlan.zhihu.com/p/1949509329544782156' },
+      { title:'六种方法写出好的提示词（官方推荐）', url:'https://zhuanlan.zhihu.com/p/648018011' },
+    ],
+  },
+  {
+    id:2, name:'文档处理', icon:'📄', learned:true,
+    desc:'用 AI 快速分析长文档、提取要点、整理报告',
+    subtopics: [
+      { name:'AI 阅读 PDF/长文', desc:'上传PDF让AI总结要点、提取数据、回答问题' },
+      { name:'AI 整理会议纪要', desc:'录音转文字→AI提炼关键决议和待办事项' },
+      { name:'AI 对比分析', desc:'多份文档横向对比，提取差异和共性' },
+      { name:'AI 翻译与润色', desc:'中英互译+学术/商业润色，保持专业术语准确' },
+    ],
+    links: [
+      { title:'AI辅助阅读文献工具推荐', url:'https://www.zhihu.com/question/618289440' },
+      { title:'Kimi AI 长文档阅读和联网搜索实战', url:'https://www.aidiscover.cn/articles/kimi-ai-how-to-use' },
+      { title:'Kimi总结100页PDF教程', url:'https://ai-bio.cn/kimi-ai-pdf-summary-tutorial/' },
+    ],
+  },
+  {
+    id:3, name:'数据思维', icon:'📊', learned:true,
+    desc:'让 AI 帮你分析数据、生成图表、发现规律',
+    subtopics: [
+      { name:'AI + Excel 数据分析', desc:'用自然语言生成公式、透视表、数据清洗' },
+      { name:'AI 生成图表', desc:'描述需求让AI自动生成柱状图、饼图、折线图' },
+      { name:'AI 数据洞察', desc:'让AI发现数据中的趋势、异常和增长点' },
+      { name:'AI 做数据报告', desc:'数据→分析→结论→建议，一键生成完整报告' },
+    ],
+    links: [
+      { title:'AI + Excel：公式生成、数据分析一键搞定', url:'https://zhuanlan.zhihu.com/p/1967917046126867475' },
+      { title:'Excel接入AI大模型DeepSeek教程', url:'https://www.bilibili.com/video/BV1MHwXe4E1H/' },
+    ],
+  },
+  {
+    id:4, name:'生活管家', icon:'🏠', learned:false,
+    desc:'让 AI 融入理财、记账、饮食、运动、睡眠等日常',
+    subtopics: [
+      { name:'AI 理财与记账', desc:'导入账单让AI分类分析消费习惯、给出省钱建议' },
+      { name:'AI 饮食规划', desc:'根据体重目标生成每日食谱、计算热量和营养缺口' },
+      { name:'AI 运动计划', desc:'根据体能水平制定个性化训练计划并追踪进度' },
+      { name:'AI 睡眠与作息', desc:'分析睡眠数据、给出改善建议、制定作息表' },
+    ],
+    links: [
+      { title:'2026年记账APP深度横评：AI时代如何管钱', url:'https://zhuanlan.zhihu.com/p/1997697806455022653' },
+      { title:'AI理财记账：自动分类收支分析消费', url:'https://www.flowpixai.com/tutorials/ai-personal-finance-tracking-2026.html' },
+      { title:'Jartalk AI记账App：智能追踪支出', url:'https://zhuanlan.zhihu.com/p/2048409601943639456' },
+    ],
+  },
+  {
+    id:5, name:'创意产出', icon:'🎨', learned:false,
+    desc:'用 AI 写文案、做设计、出方案、生成营销内容',
+    subtopics: [
+      { name:'AI 写文案', desc:'小红书笔记、朋友圈、产品详情页、广告语' },
+      { name:'AI 做设计', desc:'产品图、海报、logo、封面图生成' },
+      { name:'AI 出方案', desc:'活动策划、产品规划、营销方案一键生成' },
+      { name:'AI 内容矩阵', desc:'一鱼多吃：一个素材改写成图文/视频/直播脚本' },
+    ],
+    links: [
+      { title:'10个AI文案神器，写出爆款文案', url:'https://zhuanlan.zhihu.com/p/1896189912564352475' },
+      { title:'2026年AI设计工具大盘点', url:'https://zhuanlan.zhihu.com/p/2010394767545095612' },
+      { title:'AI内容创作与营销全链路实战', url:'https://blog.51cto.com/u_17705031/14624072' },
+    ],
+  },
+  {
+    id:6, name:'自动化', icon:'⚙️', learned:false,
+    desc:'搭建 AI 工作流，让重复任务自动完成',
+    subtopics: [
+      { name:'Coze 扣子搭建', desc:'零代码搭建AI智能体：客服机器人、内容生成器' },
+      { name:'AI 工作流设计', desc:'触发→处理→输出，串联多个AI能力自动流转' },
+      { name:'Zapier/Make 自动化', desc:'连接不同App，实现跨平台自动同步和处理' },
+      { name:'AI 批量处理', desc:'批量翻译、批量生成、批量分类，效率翻10倍' },
+    ],
+    links: [
+      { title:'Coze扣子工作流智能体保姆级搭建教程', url:'https://www.bilibili.com/video/BV1dqNE6tEie/' },
+      { title:'B站最全Coze扣子实战教学0基础入门', url:'https://zhuanlan.zhihu.com/p/1999294891977639583' },
+      { title:'保姆级教程：小白轻松搭建扣子工作流', url:'https://zhuanlan.zhihu.com/p/1954276051669722326' },
+    ],
+  },
+  {
+    id:7, name:'决策辅助', icon:'🧠', learned:false,
+    desc:'用 AI 分析复杂问题、辅助商业决策',
+    subtopics: [
+      { name:'AI 竞品分析', desc:'让AI抓取竞品数据、对比优劣、找差异化机会' },
+      { name:'AI 商业分析', desc:'市场趋势分析、用户画像、SWOT分析' },
+      { name:'AI 问题拆解', desc:'复杂问题分层拆解，找出根因和解决方案' },
+      { name:'AI 风险评估', desc:'让AI预判方案风险、模拟不同决策的后果' },
+    ],
+    links: [
+      { title:'3小时搞定竞品分析！AI神技速成', url:'https://www.bilibili.com/video/BV1DBJjzFEgq/' },
+      { title:'用AI分析数据生成报告辅助决策', url:'https://www.zhihu.com/question/2044207001941562184' },
+      { title:'如何运用AI辅助问题分析', url:'https://zhuanlan.zhihu.com/p/685695483' },
+    ],
+  },
+  {
+    id:8, name:'创造工具', icon:'🔧', learned:false,
+    desc:'用 AI 写代码、做小应用、建网站',
+    subtopics: [
+      { name:'AI 写代码入门', desc:'零基础用AI生成网页、小程序、脚本' },
+      { name:'Cursor 编辑器', desc:'AI辅助编程神器，边写边补全、自动调试' },
+      { name:'AI 做小应用', desc:'用自然语言描述需求，AI直接生成可用App' },
+      { name:'AI 建网站', desc:'从设计到代码，AI一键生成完整网站' },
+    ],
+    links: [
+      { title:'Cursor超详细使用教程，从安装到高级', url:'https://zhuanlan.zhihu.com/p/852278803' },
+      { title:'写给普通人的AI编程保姆级教程（0基础）', url:'https://zhuanlan.zhihu.com/p/28333936574' },
+      { title:'B站最系统AI应用开发入门到精通', url:'https://www.bilibili.com/video/BV12gLU69EG2/' },
+    ],
+  },
+];
+
+const aiDailyTips = [
+  '💡 今天试试：让AI帮你分析今天的饮食记录，计算热量和营养缺口',
+  '💡 今天试试：用AI给你的小红书笔记生成5个爆款标题备选',
+  '💡 今天试试：让AI帮你规划本月美妆产品开发的时间线',
+  '💡 今天试试：用AI模拟不同成分搭配的功效和稳定性',
+  '💡 今天试试：让AI帮你把今天的英语单词编成一个小故事帮助记忆',
+  '💡 今天试试：用AI分析竞品小红书账号的内容策略',
+  '💡 今天试试：让AI根据你的收入支出给出月度理财建议',
+];
+
+const quickFoods = [
+  { name:'🥚 鸡蛋(1个)', cal:70 },
+  { name:'🥛 牛奶(250ml)', cal:150 },
+  { name:'🍌 香蕉(1根)', cal:105 },
+  { name:'🍎 苹果(1个)', cal:95 },
+  { name:'🍞 全麦面包(2片)', cal:160 },
+  { name:'🥗 沙拉(1份)', cal:120 },
+  { name:'🍚 米饭(1碗)', cal:200 },
+  { name:'☕ 拿铁(中杯)', cal:190 },
+];
+
+// ============ STATE ============
+const STORAGE_KEY = 'beauty_lab_data';
+let state = loadState();
+
+function defaultState() {
+  return {
+    theme: 'light',
+    wordIndex: 0,
+    wordDoneToday: 0,
+    wordStreak: 0,
+    lastWordDate: '',
+    sentenceIndex: 0,
+    sentenceDoneToday: 0,
+    sentenceStreak: 0,
+    ecomPhase: 1,            // 当前阶段 (1-4)
+    ecomCurrentDay: 1,       // 当前阶段内第几天 (1-7)
+    ecomTaskDone: {},        // 任务完成状态 { "phase-day": [true,false,...] }
+    dietLog: [],
+    exerciseMin: 0,
+    sleepHr: '',
+    waterCups: 0,
+    selfCareDone: false,
+    periodStartDate: '',    // 最近一次姨妈开始日期 (YYYY-MM-DD)
+    periodCycleDays: 28,    // 周期天数
+    periodDuration: 5,      // 持续天数
+    lastHealthDate: '',
+    aiProgress: 3, // learned 3 of 8
+    streak: 1,
+    lastActiveDate: '',
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      // merge with defaults for new fields
+      const def = defaultState();
+      for (const k in def) {
+        if (!(k in s)) s[k] = def[k];
+      }
+      return s;
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ============ DATE & STREAK ============
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function checkDayReset() {
+  const t = todayStr();
+  if (state.lastActiveDate !== t) {
+    // new day: check if yesterday was active for streak
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = yesterday.toISOString().split('T')[0];
+    if (state.lastActiveDate === yStr) {
+      state.streak++;
+    } else if (state.lastActiveDate !== t) {
+      state.streak = 1;
+    }
+    // reset daily
+    state.wordIndex = 0;
+    state.wordDoneToday = 0;
+    state.sentenceIndex = 0;
+    state.sentenceDoneToday = 0;
+    state.dietLog = [];
+    state.exerciseMin = 0;
+    state.sleepHr = '';
+    state.waterCups = 0;
+    state.selfCareDone = false;
+    state.lastActiveDate = t;
+    saveState();
+  }
+}
+
+// ============ RENDER ============
+function renderAll() {
+  checkDayReset();
+  renderDate();
+  renderTrends();
+  renderWords();
+  renderSentences();
+  renderAI();
+  renderHealth();
+  renderEcom();
+  saveState();
+}
+
+function renderDate() {
+  const d = new Date();
+  const opts = { year:'numeric', month:'long', day:'numeric', weekday:'long' };
+  document.getElementById('dateDisplay').textContent = d.toLocaleDateString('zh-CN', opts);
+  document.getElementById('streakDisplay').textContent = '🔥 连续打卡 ' + state.streak + ' 天';
+}
+
+function renderTrends() {
+  const grid = document.getElementById('trendGrid');
+  grid.innerHTML = trendData.slice(0, 6).map((t, i) => `
+    <div class="trend-card" onclick="openTrendDetail(${i})">
+      <span class="platform ${t.platform}">${
+        t.platform==='xhs'?'小红书':t.platform==='douyin'?'抖音':'TikTok'
+      }</span>
+      <div class="trend-title">${t.title}</div>
+      <div class="trend-meta">👀 ${t.views}</div>
+      ${t.rank <= 3 ? `<div class="rank-badge">${t.rank}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function openTrendDetail(i) {
+  const t = trendData[i];
+  document.getElementById('modalTitle').textContent = '📌 资讯详情';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:15px;font-weight:700;margin-bottom:8px;">${t.title}</p>
+    <p style="color:var(--sub);margin-bottom:12px;">平台：${
+      t.platform==='xhs'?'小红书':t.platform==='douyin'?'抖音':'TikTok'
+    } · 热度：${t.views}</p>
+    <div style="background:rgba(232,67,147,0.08);padding:12px;border-radius:10px;font-size:13px;line-height:1.6;">
+      <strong>💡 开发启示：</strong><br>
+      ${getTrendInsight(t)}
+    </div>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);">💡 提示：将此趋势作为产品开发/内容创作参考方向</p>
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
+function getTrendInsight(t) {
+  const insights = {
+    '妆容': '关注色彩趋势→开发对应色号彩妆；可做"新手向"教程内容引流',
+    '医用敷料': '械字号产品是医美渠道核心品类，关注备案法规和竞品成分',
+    'Glass skin': '水光肌概念持续火爆，可考虑开发光泽感底妆/护肤线',
+    '轻医美': '术后修复产品需求巨大，械字号修复敷料/精华是蓝海',
+    '成分': '成分党是核心消费群，产品开发需突出功效成分和科学背书',
+    'Korean': '韩系护肤全球影响力不减，可借鉴其产品形态和营销节奏',
+    '备案': '法规合规是开发底线，需持续关注NMPA最新动态',
+    '械三类': '三类器械门槛高但壁垒强，长期布局价值大',
+    'Laser': '光电项目术后修复是刚需，可开发专用修复套装',
+    'OEM': '选厂核心：资质(械字号能力)、起订量、配方研发能力',
+  };
+  for (const [k, v] of Object.entries(insights)) {
+    if (t.title.includes(k)) return v;
+  }
+  return '关注该趋势的产品形态、核心成分和营销策略，思考差异化切入点。';
+}
+
+// ============ ENGLISH ============
+function renderWords() {
+  const container = document.getElementById('wordCards');
+  const start = state.wordIndex;
+  const words = dailyWords.slice(start, start + 5);
+  container.innerHTML = words.map((w, i) => `
+    <div class="word-card">
+      <div onclick="event.stopPropagation();speakWord('${w.word}', this)" style="cursor:pointer;flex:1;">
+        <div class="word-main">${w.word} <span style="font-size:11px;color:var(--accent3);font-weight:600;">🇺🇸</span></div>
+        <div class="word-phonetic">${w.phonetic}</div>
+        <div class="word-meaning">${w.meaning}</div>
+      </div>
+      <div class="word-actions">
+        <button onclick="event.stopPropagation();speakWord('${w.word}', this)">🔊</button>
+        <button class="done" onclick="event.stopPropagation();markWordDone(${start + i})">✅</button>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('wordDone').textContent = state.wordDoneToday;
+  document.getElementById('wordTotal').textContent = dailyWords.length;
+  document.getElementById('wordStreak').textContent = state.wordStreak;
+
+  if (state.wordIndex >= dailyWords.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--accent3);font-size:16px;">🎉 今日单词已全部完成！</div>';
+  }
+}
+
+function markWordDone(idx) {
+  if (state.wordIndex >= dailyWords.length) return;
+  state.wordIndex = idx + 1;
+  state.wordDoneToday = state.wordIndex;
+  if (state.wordDoneToday >= dailyWords.length) {
+    state.wordStreak++;
+    showToast('🎉 今日单词全部完成！连续 ' + state.wordStreak + ' 天');
+  }
+  saveState();
+  renderWords();
+  renderHealth();
+}
+
+// ============ VOICE ENGINE (dual: WebSpeechAPI + Server fallback) ============
+let usVoice = null;
+let audioPlayer = null;
+let speakingLock = false;
+
+// Try to load American English voice
+function loadUSVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  if (voices.length === 0) return;
+  const googleUS = voices.find(v => v.lang === 'en-US' && v.name.includes('Google'));
+  const appleUS = voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Alex')));
+  const anyUS = voices.find(v => v.lang === 'en-US');
+  const anyEn = voices.find(v => v.lang.startsWith('en'));
+  usVoice = googleUS || appleUS || anyUS || anyEn || null;
+  try { if (usVoice) localStorage.setItem('usVoiceName', usVoice.name); } catch(e) {}
+}
+if ('speechSynthesis' in window) {
+  loadUSVoice();
+  speechSynthesis.onvoiceschanged = loadUSVoice;
+}
+
+function speakWithBrowser(text, btn, onEnd) {
+  if (!('speechSynthesis' in window)) return false;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  u.pitch = 1.0;
+  u.volume = 1.0;
+  if (usVoice) u.voice = usVoice;
+  if (btn) setSpeakingState(btn, true);
+  u.onend = function() { speakingLock = false; if (btn) setSpeakingState(btn, false); if (onEnd) onEnd(); };
+  u.onerror = function() { speakingLock = false; if (btn) setSpeakingState(btn, false); };
+  speechSynthesis.speak(u);
+  return true;
+}
+
+function speakWithServer(text, btn, onEnd) {
+  const url = '/api/tts?text=' + encodeURIComponent(text);
+  audioPlayer = new Audio(url);
+  if (btn) setSpeakingState(btn, true);
+  audioPlayer.onended = function() { audioPlayer = null; speakingLock = false; if (btn) setSpeakingState(btn, false); if (onEnd) onEnd(); };
+  audioPlayer.onerror = function() { audioPlayer = null; speakingLock = false; if (btn) setSpeakingState(btn, false); };
+  audioPlayer.play().catch(function() { audioPlayer = null; speakingLock = false; if (btn) setSpeakingState(btn, false); });
+}
+
+function stopAudio() {
+  if (audioPlayer) { audioPlayer.pause(); audioPlayer = null; }
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  speakingLock = false;
+}
+
+function setSpeakingState(btn, speaking) {
+  if (!btn) return;
+  if (speaking) {
+    btn.dataset.original = btn.innerHTML;
+    btn.innerHTML = '🎵';
+    btn.style.background = 'var(--accent2)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--accent2)';
+  } else {
+    if (btn.dataset.original) btn.innerHTML = btn.dataset.original;
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }
+}
+
+function playTTS(text, btn, onEnd) {
+  if (speakingLock) return;
+  stopAudio();
+  speakingLock = true;
+  if (!speakWithBrowser(text, btn, onEnd)) {
+    speakWithServer(text, btn, onEnd);
+  }
+}
+
+function speakWord(word, btn) {
+  playTTS(word, btn);
+}
+
+// ============ SENTENCES ============
+function renderSentences() {
+  const container = document.getElementById('sentenceArea');
+  const start = state.sentenceIndex;
+  const sentences = dailySentences.slice(start, start + 3);
+  container.innerHTML = sentences.map((s, i) => `
+    <div class="sentence-card" id="sentCard${start + i}">
+      <div class="sent-header">
+        <div style="cursor:pointer;flex:1;" onclick="event.stopPropagation();speakSentence(${start + i}, this)">
+          <div class="sent-q">${s.q} <span style="font-size:11px;color:var(--accent3);font-weight:600;">🇺🇸</span></div>
+          <div class="sent-q-zh">${s.qzh}</div>
+        </div>
+        <div class="sent-actions">
+          <button onclick="event.stopPropagation();speakSentence(${start + i}, this)">🔊</button>
+          <button class="done-btn" onclick="event.stopPropagation();markSentenceDone(${start + i})">✅</button>
+          <button style="font-size:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;" onclick="event.stopPropagation();toggleSentence(${start + i})">▼</button>
+        </div>
+      </div>
+      <div class="sent-a">💬 ${s.a}</div>
+      <div class="sent-a-zh">🇨🇳 ${s.azh}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('sentDone').textContent = state.sentenceDoneToday;
+  document.getElementById('sentTotal').textContent = dailySentences.length;
+  document.getElementById('sentStreak').textContent = state.sentenceStreak;
+
+  if (state.sentenceIndex >= dailySentences.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--accent3);font-size:16px;">🎉 今日句型已全部完成！</div>';
+  }
+}
+
+function toggleSentence(idx) {
+  const card = document.getElementById('sentCard' + idx);
+  if (!card) return;
+  card.classList.toggle('expanded');
+  // 旋转箭头
+  const btn = card.querySelector('.sent-actions button:last-child');
+  if (btn) {
+    btn.style.transform = card.classList.contains('expanded') ? 'rotate(180deg)' : '';
+  }
+}
+
+function markSentenceDone(idx) {
+  if (state.sentenceIndex >= dailySentences.length) return;
+  state.sentenceIndex = idx + 1;
+  state.sentenceDoneToday = state.sentenceIndex;
+  if (state.sentenceDoneToday >= dailySentences.length) {
+    state.sentenceStreak++;
+    showToast('🎉 今日句型全部完成！连续 ' + state.sentenceStreak + ' 天');
+  }
+  saveState();
+  renderSentences();
+}
+
+function speakSentence(idx, btn) {
+  const s = dailySentences[idx];
+  if (!s) return;
+  // Play question first, then answer after a delay
+  playTTS(s.q, btn, function() {
+    setTimeout(function() {
+      playTTS(s.a, btn, function() {
+        if (btn) setSpeakingState(btn, false);
+      });
+    }, 400);
+  });
+  // Also expand the card
+  const card = document.getElementById('sentCard' + idx);
+  if (card) card.classList.add('expanded');
+}
+
+// ============ AI ============
+let aiExpandedSkill = null; // 当前展开的技能ID
+
+function renderAI() {
+  const learned = ai8D.filter(d => d.learned).length;
+  const pct = Math.round((learned / 8) * 100);
+  document.getElementById('aiPercent').textContent = pct + '%';
+
+  const total = 175.93; // circumference
+  const offset = total - (total * pct / 100);
+  document.getElementById('aiRing').setAttribute('stroke-dashoffset', offset);
+
+  document.getElementById('aiSkills').innerHTML = ai8D.map(d => `
+    <div class="ai-skill-tag ${d.learned ? 'learned' : 'locked'}" onclick="toggleAISkill(${d.id})">
+      ${d.learned ? '✅' : '🔒'} ${d.icon} ${d.name}
+    </div>
+  `).join('');
+
+  renderAISkillDetail();
+
+  const tipIdx = new Date().getDate() % aiDailyTips.length;
+  document.getElementById('aiDailyTip').innerHTML = `
+    <div class="tip-label">💡 今日AI练习</div>
+    ${aiDailyTips[tipIdx]}
+  `;
+}
+
+function toggleAISkill(id) {
+  if (aiExpandedSkill === id) {
+    aiExpandedSkill = null;
+  } else {
+    aiExpandedSkill = id;
+  }
+  renderAISkillDetail();
+}
+
+function renderAISkillDetail() {
+  const container = document.getElementById('aiSkillDetail');
+  if (!aiExpandedSkill) {
+    container.classList.remove('active');
+    container.innerHTML = '';
+    return;
+  }
+  const skill = ai8D.find(d => d.id === aiExpandedSkill);
+  if (!skill) return;
+
+  container.innerHTML = `
+    <div class="detail-header">${skill.icon} ${skill.name} ${skill.learned ? '✅' : '🔒'}</div>
+    <div class="detail-desc">${skill.desc}</div>
+    <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--accent2);">📚 学习路径（${skill.subtopics.length}个小点）：</div>
+    ${skill.subtopics.map((s, i) => `
+      <div class="ai-subtopic">
+        <div class="sub-name">${i+1}. ${s.name}</div>
+        <div class="sub-desc">${s.desc}</div>
+      </div>
+    `).join('')}
+    <div class="ai-links">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--accent2);">🔗 学习材料（点击直接看）：</div>
+      ${skill.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">→ ${l.title}</a>`).join('')}
+    </div>
+  `;
+  container.classList.add('active');
+}
+
+// ============ HEALTH ============
+function renderHealth() {
+  // Diet
+  const totalCal = state.dietLog.reduce((sum, item) => sum + item.cal, 0);
+  document.getElementById('calEaten').textContent = totalCal;
+  document.getElementById('calLabel').textContent = totalCal + ' / 2000 kcal';
+  const calPct = Math.min((totalCal / 2000) * 100, 100);
+  document.getElementById('calBar').style.width = calPct + '%';
+
+  // Exercise
+  document.getElementById('exerMin').textContent = state.exerciseMin;
+  const exerEl = document.getElementById('exerStatus');
+  exerEl.className = 'h-status ' + (state.exerciseMin >= 30 ? 'good' : state.exerciseMin > 0 ? 'warn' : 'bad');
+
+  // Sleep
+  document.getElementById('sleepHr').textContent = state.sleepHr || '--';
+  const sleepEl = document.getElementById('sleepStatus');
+  const sh = parseFloat(state.sleepHr) || 0;
+  sleepEl.className = 'h-status ' + (sh >= 7 ? 'good' : sh > 0 ? 'warn' : 'bad');
+
+  // Water
+  document.getElementById('waterCups').textContent = state.waterCups;
+  const wEl = document.getElementById('waterStatus');
+  wEl.className = 'h-status ' + (state.waterCups >= 8 ? 'good' : state.waterCups >= 4 ? 'warn' : 'bad');
+
+  // Energy gap
+  const bmr = 1400; // estimated
+  const exerciseCal = state.exerciseMin * 5;
+  const totalOut = bmr + exerciseCal;
+  const gap = totalOut - totalCal;
+  const gapStr = gap > 0 ? '-' + gap : '+' + Math.abs(gap);
+  document.getElementById('energyGap').textContent = gapStr + ' kcal';
+
+  // Self care
+  document.getElementById('selfCare').textContent = state.selfCareDone ? '✅' : '❓';
+  document.getElementById('careStatus').className = 'h-status ' + (state.selfCareDone ? 'good' : 'bad');
+
+  // Period tracker
+  renderPeriod();
+}
+
+function renderPeriod() {
+  const dayEl = document.getElementById('periodDay');
+  const statusEl = document.getElementById('periodStatus');
+  if (!state.periodStartDate) {
+    dayEl.textContent = '--';
+    statusEl.className = 'h-status bad';
+    return;
+  }
+  const start = new Date(state.periodStartDate + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    // 还没到
+    dayEl.textContent = Math.abs(diffDays) + '天后';
+    statusEl.className = 'h-status warn';
+  } else if (diffDays < state.periodDuration) {
+    // 姨妈中
+    dayEl.textContent = '第' + (diffDays + 1) + '天';
+    statusEl.className = 'h-status good';
+    statusEl.style.background = '#e84393';
+  } else if (diffDays < state.periodCycleDays) {
+    // 安全期/黄体期等
+    const remain = state.periodCycleDays - diffDays;
+    dayEl.textContent = remain + '天后';
+    statusEl.className = 'h-status warn';
+  } else {
+    // 已超过周期，可能延迟
+    const overdue = diffDays - state.periodCycleDays;
+    dayEl.textContent = '延迟' + overdue + '天';
+    statusEl.className = 'h-status bad';
+  }
+}
+
+// ============ ECOM 4阶段路线图 ============
+function getEcomTaskKey() {
+  return state.ecomPhase + '-' + state.ecomCurrentDay;
+}
+
+function isPhaseDone(phaseId) {
+  const phase = ecomPhases[phaseId - 1];
+  if (!phase) return false;
+  return phase.days.every((d, i) => {
+    const key = phaseId + '-' + (i + 1);
+    const tasks = state.ecomTaskDone[key] || [];
+    return tasks.length === d.tasks.length && tasks.every(t => t);
+  });
+}
+
+function renderEcom() {
+  const currentPhase = state.ecomPhase || 1;
+  const currentDay = state.ecomCurrentDay || 1;
+  const phase = ecomPhases[currentPhase - 1];
+  if (!phase) return;
+
+  // Render phase tabs
+  document.getElementById('ecomPhaseTabs').innerHTML = ecomPhases.map(p => {
+    let cls = 'ecom-phase-tab';
+    if (p.id === currentPhase) cls += ' active';
+    if (isPhaseDone(p.id)) cls += ' done';
+    return '<div class="' + cls + '" onclick="switchEcomPhase(' + p.id + ')">' + p.icon + ' ' + p.name + '</div>';
+  }).join('');
+
+  // Phase info
+  const phaseDone = isPhaseDone(currentPhase);
+  document.getElementById('ecomPhaseInfo').innerHTML =
+    '<strong>阶段 ' + currentPhase + '/4：' + phase.name + '</strong><br>' + phase.desc +
+    (phaseDone ? ' · ✅ 已完成' : '');
+
+  // Progress bar (7 dots for current phase)
+  const progressHtml = phase.days.map((d, i) => {
+    const day = i + 1;
+    let cls = 'ecom-day-dot';
+    const key = currentPhase + '-' + day;
+    const tasks = state.ecomTaskDone[key] || [];
+    const allDone = tasks.length === d.tasks.length && tasks.every(t => t);
+    if (allDone) cls += ' done';
+    else if (day === currentDay) cls += ' current';
+    return '<div class="' + cls + '"></div>';
+  }).join('');
+  document.getElementById('ecomProgress').innerHTML = progressHtml;
+
+  // Current day content
+  const plan = phase.days[currentDay - 1];
+  if (!plan) return;
+  const taskKey = getEcomTaskKey();
+  let tasks = state.ecomTaskDone[taskKey];
+  if (!tasks) {
+    tasks = new Array(plan.tasks.length).fill(false);
+    state.ecomTaskDone[taskKey] = tasks;
+  }
+
+  document.getElementById('ecomDayContent').innerHTML = `
+    <div class="ecom-day-card" style="border-left-color:${phase.color}">
+      <div class="day-header">
+        <span class="day-badge" style="background:${phase.color}">DAY ${plan.day}</span>
+        <span class="day-icon">${plan.icon}</span>
+        <span class="day-title">${plan.title}</span>
+      </div>
+      <div class="day-goal">🎯 今日目标：${plan.goal}</div>
+      <ul class="ecom-task-list">
+        ${plan.tasks.map((task, i) => `
+          <li class="${tasks[i] ? 'done' : ''}" onclick="toggleEcomTask(${i})">
+            <div class="task-check">${tasks[i] ? '✓' : ''}</div>
+            <span class="task-text">${task}</span>
+          </li>
+        `).join('')}
+      </ul>
+      <div class="ecom-tutorial">
+        📚 学习教程：${plan.tutorial}
+        ${(plan.links || []).map(l => '<br><a href="' + l.url + '" target="_blank" rel="noopener" style="color:var(--accent2);font-weight:600;text-decoration:none;font-size:12px;">→ ' + l.title + '</a>').join('')}
+      </div>
+      <div class="ecom-checkpoint">✅ 今日通关：${plan.checkpoint}</div>
+      <div class="ecom-nav">
+        <button onclick="prevEcomDay()" ${currentPhase === 1 && currentDay === 1 ? 'disabled style="opacity:0.4"' : ''}>← 上一天</button>
+        <button class="primary" onclick="nextEcomDay()" ${currentPhase === 4 && currentDay === 7 ? 'disabled style="opacity:0.4"' : ''}>下一天 →</button>
+      </div>
+    </div>
+  `;
+}
+
+function switchEcomPhase(phaseId) {
+  state.ecomPhase = phaseId;
+  state.ecomCurrentDay = 1;
+  saveState();
+  renderEcom();
+  showToast('📋 切换到阶段 ' + phaseId + '：' + ecomPhases[phaseId-1].name);
+}
+
+function toggleEcomTask(idx) {
+  const taskKey = getEcomTaskKey();
+  const phase = ecomPhases[state.ecomPhase - 1];
+  const plan = phase.days[state.ecomCurrentDay - 1];
+  if (!state.ecomTaskDone[taskKey]) {
+    state.ecomTaskDone[taskKey] = new Array(plan.tasks.length).fill(false);
+  }
+  state.ecomTaskDone[taskKey][idx] = !state.ecomTaskDone[taskKey][idx];
+  const doneCount = state.ecomTaskDone[taskKey].filter(t => t).length;
+  if (doneCount === plan.tasks.length) {
+    showToast('🎉 Day ' + state.ecomCurrentDay + ' 全部完成！');
+    // Check if phase is now complete
+    if (isPhaseDone(state.ecomPhase)) {
+      setTimeout(() => {
+        if (state.ecomPhase < 4) {
+          showToast('🏆 阶段' + state.ecomPhase + '全部完成！可进入下一阶段');
+        } else {
+          showToast('🏆 全部4个阶段完成！你已经是小红书电商高手了');
+        }
+      }, 1500);
+    }
+  }
+  saveState();
+  renderEcom();
+}
+
+function nextEcomDay() {
+  const phase = ecomPhases[state.ecomPhase - 1];
+  const maxDay = phase.days.length;
+  if (state.ecomCurrentDay < maxDay) {
+    state.ecomCurrentDay++;
+    saveState();
+    renderEcom();
+    showToast('📖 Day ' + state.ecomCurrentDay + '：' + phase.days[state.ecomCurrentDay-1].title);
+  } else if (state.ecomPhase < 4) {
+    // Move to next phase
+    state.ecomPhase++;
+    state.ecomCurrentDay = 1;
+    saveState();
+    renderEcom();
+    showToast('🎉 进入阶段' + state.ecomPhase + '：' + ecomPhases[state.ecomPhase-1].name);
+  }
+}
+
+function prevEcomDay() {
+  if (state.ecomCurrentDay > 1) {
+    state.ecomCurrentDay--;
+    saveState();
+    renderEcom();
+  } else if (state.ecomPhase > 1) {
+    // Move to previous phase, last day
+    state.ecomPhase--;
+    const prevPhase = ecomPhases[state.ecomPhase - 1];
+    state.ecomCurrentDay = prevPhase.days.length;
+    saveState();
+    renderEcom();
+  }
+}
+
+// ============ MODALS ============
+function openModal(type) {
+  const overlay = document.getElementById('modalOverlay');
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+
+  switch(type) {
+    case 'trends':
+      title.textContent = '🔥 今日 10 条美妆资讯';
+      body.innerHTML = trendData.map((t,i) => `
+        <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer;" onclick="openTrendDetail(${i})">
+          <span style="font-weight:800;color:var(--accent);min-width:24px;">#${i+1}</span>
+          <div style="flex:1;">
+            <span style="font-size:11px;padding:2px 8px;border-radius:8px;background:${
+              t.platform==='xhs'?'#ff2442':t.platform==='douyin'?'#fe2c55':'#000'
+            };color:#fff;margin-right:6px;">${
+              t.platform==='xhs'?'小红书':t.platform==='douyin'?'抖音':'TikTok'
+            }</span>
+            <span style="font-size:14px;">${t.title}</span>
+            <span style="font-size:11px;color:var(--sub);margin-left:6px;">👀 ${t.views}</span>
+          </div>
+        </div>
+      `).join('');
+      break;
+
+    case 'diet':
+      title.textContent = '🍽️ 饮食记录';
+      body.innerHTML = `
+        <div class="food-input-row">
+          <input type="text" id="foodInput" placeholder="输入食物名称..." />
+          <input type="number" id="calInput" placeholder="kcal" style="width:80px;" />
+          <button onclick="addFood()">+添加</button>
+        </div>
+        <div class="quick-add">
+          ${quickFoods.map(f => `<span class="qa-btn" onclick="addQuickFood('${f.name}',${f.cal})">${f.name} ${f.cal}kcal</span>`).join('')}
+        </div>
+        <div class="food-log" id="foodLog"></div>
+        <div style="text-align:right;margin-top:8px;font-weight:700;">
+          总计：<span id="foodTotal" style="color:var(--accent);">${state.dietLog.reduce((s,i)=>s+i.cal,0)}</span> kcal
+        </div>
+      `;
+      renderFoodLog();
+      break;
+
+    case 'exercise':
+      title.textContent = '🏃 运动记录';
+      body.innerHTML = `
+        <p style="margin-bottom:12px;">今日运动时长（分钟）</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          ${[10,15,20,30,45,60].map(m => `
+            <span style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:14px;${state.exerciseMin===m?'background:var(--accent3);color:#fff;border-color:var(--accent3);':''}"
+              onclick="setExercise(${m})">${m}分钟</span>
+          `).join('')}
+        </div>
+        <input type="number" id="exerCustom" placeholder="自定义分钟数" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);font-size:14px;margin-bottom:8px;" />
+        <button onclick="setExercise(parseInt(document.getElementById('exerCustom').value)||0)" style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--accent3);color:#fff;font-weight:700;font-size:15px;">保存</button>
+      `;
+      break;
+
+    case 'sleep':
+      title.textContent = '😴 睡眠记录';
+      body.innerHTML = `
+        <p style="margin-bottom:12px;">昨晚睡了多久？（小时）</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          ${[5,5.5,6,6.5,7,7.5,8,8.5,9].map(h => `
+            <span style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:14px;${state.sleepHr==h?'background:var(--accent2);color:#fff;border-color:var(--accent2);':''}"
+              onclick="setSleep(${h})">${h}h</span>
+          `).join('')}
+        </div>
+      `;
+      break;
+
+    case 'water':
+      title.textContent = '💧 饮水记录（1杯≈250ml）';
+      body.innerHTML = `
+        <div class="water-dots">
+          ${Array.from({length:12}, (_,i) => `
+            <div class="water-dot ${i < state.waterCups ? 'filled' : ''}" onclick="addWater(${i+1})">${i+1}</div>
+          `).join('')}
+        </div>
+        <p style="text-align:center;color:var(--sub);">已喝 ${state.waterCups} 杯 · 目标 8 杯</p>
+        <p style="text-align:center;margin-top:8px;">点击杯子来记录饮水 💙</p>
+      `;
+      break;
+
+    case 'selfcare':
+      title.textContent = '💆 今天有没有好好对自己？';
+      body.innerHTML = `
+        <ul class="checklist">
+          ${[
+            '🪞 认真护肤（洁面+水+精华+面霜）',
+            '🧘 冥想或深呼吸 5 分钟',
+            '📵 放下手机 30 分钟',
+            '🛁 泡个热水澡或泡脚',
+            '📖 读 10 页喜欢的书',
+            '🎵 听一首喜欢的歌',
+            '💬 和好朋友聊聊天',
+            '🌸 对自己说一句"今天辛苦了"',
+          ].map((item, i) => `
+            <li class="${state.selfCareDone ? 'done' : ''}" onclick="toggleSelfCare()">
+              <div class="check-box">${state.selfCareDone ? '✓' : ''}</div>
+              <span class="check-text">${item}</span>
+            </li>
+          `).join('')}
+        </ul>
+        <button onclick="markSelfCare()" style="width:100%;margin-top:16px;padding:12px;border-radius:12px;border:none;background:${state.selfCareDone?'var(--accent3)':'var(--accent)'};color:#fff;font-weight:700;font-size:15px;cursor:pointer;">
+          ${state.selfCareDone ? '✅ 今天已经好好爱自己了' : '❤️ 标记：今天有好好对自己'}
+        </button>
+      `;
+      break;
+
+    case 'period':
+      title.textContent = '🩸 姨妈周期管理';
+      const ps = state.periodStartDate ? new Date(state.periodStartDate + 'T00:00:00') : null;
+      const pt = new Date(); pt.setHours(0,0,0,0);
+      const pd = ps ? Math.floor((pt - ps) / (1000*60*60*24)) : -1;
+      const inPeriod = ps && pd >= 0 && pd < state.periodDuration;
+      const nextStart = ps ? new Date(ps.getTime() + state.periodCycleDays * 24*60*60*1000) : null;
+      const nextStr = nextStart ? nextStart.toLocaleDateString('zh-CN', {month:'long',day:'numeric'}) : '--';
+
+      body.innerHTML = `
+        <div style="background:${inPeriod?'rgba(232,67,147,0.1)':'rgba(108,92,231,0.06)'};border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:13px;color:var(--sub);margin-bottom:4px;">${inPeriod ? '🔴 姨妈进行中' : '📅 当前状态'}</div>
+          <div style="font-size:28px;font-weight:800;color:${inPeriod?'var(--accent)':'var(--accent2)'};" id="periodStatusText">
+            ${!state.periodStartDate ? '尚未设置' : inPeriod ? '第'+(pd+1)+'天' : pd<0 ? Math.abs(pd)+'天后开始' : pd<state.periodCycleDays ? '距下次 '+(state.periodCycleDays-pd)+' 天' : '已延迟'+(pd-state.periodCycleDays)+'天'}
+          </div>
+        </div>
+
+        <p style="font-weight:700;margin-bottom:8px;">📋 周期设置</p>
+        <div style="display:flex;gap:12px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <label style="font-size:12px;color:var(--sub);">周期天数</label>
+            <input type="number" id="periodCycle" value="${state.periodCycleDays}" min="21" max="45"
+              style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);font-size:14px;margin-top:4px;" />
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:12px;color:var(--sub);">持续天数</label>
+            <input type="number" id="periodDur" value="${state.periodDuration}" min="2" max="10"
+              style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);font-size:14px;margin-top:4px;" />
+          </div>
+        </div>
+        <button onclick="savePeriodSettings()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">💾 保存周期设置</button>
+
+        <p style="font-weight:700;margin-bottom:8px;">📅 记录最近一次姨妈</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          ${getRecentDates(14).map(d => {
+            const dstr = d.toISOString().split('T')[0];
+            const isSelected = state.periodStartDate === dstr;
+            return '<span style="padding:8px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:13px;'+
+              (isSelected?'background:var(--accent);color:#fff;border-color:var(--accent);':'')+
+              '" onclick="setPeriodStart(\''+dstr+'\')">'+
+              (d.getMonth()+1)+'/'+d.getDate()+'</span>';
+          }).join('')}
+        </div>
+        <input type="date" id="periodDatePicker" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);font-size:14px;margin-bottom:8px;" />
+        <button onclick="setPeriodStart(document.getElementById('periodDatePicker').value)" style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:16px;">📌 设为姨妈开始日</button>
+
+        <p style="font-weight:700;margin-bottom:8px;">📊 未来预测</p>
+        <div style="font-size:13px;color:var(--sub);line-height:1.8;">
+          ${!state.periodStartDate ? '请先设置最近一次姨妈开始日期' : `
+            📍 上次开始：${ps.toLocaleDateString('zh-CN')}<br>
+            📍 预计下次：${nextStr}<br>
+            📍 预计排卵日：${new Date(ps.getTime()+(state.periodCycleDays-14)*24*60*60*1000).toLocaleDateString('zh-CN',{month:'long',day:'numeric'})}<br>
+            📍 安全期：经前7天 + 经后8天（仅供参考）
+          `}
+        </div>
+        <div style="margin-top:12px;padding:10px;background:rgba(232,67,147,0.06);border-radius:10px;font-size:12px;color:var(--sub);line-height:1.6;">
+          💡 <strong>经期护肤提醒：</strong>姨妈期间皮肤敏感度↑，建议精简护肤步骤，避免刷酸和强功效成分，多补水、温和清洁。
+        </div>
+      `;
+      break;
+  }
+  overlay.classList.remove('hidden');
+}
+
+function getRecentDates(days) {
+  const dates = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function setPeriodStart(dateStr) {
+  if (!dateStr) return;
+  state.periodStartDate = dateStr;
+  saveState();
+  renderAll();
+  openModal('period');
+  showToast('📅 姨妈开始日已更新');
+}
+
+function savePeriodSettings() {
+  const cycle = parseInt(document.getElementById('periodCycle')?.value) || 28;
+  const dur = parseInt(document.getElementById('periodDur')?.value) || 5;
+  state.periodCycleDays = Math.max(21, Math.min(45, cycle));
+  state.periodDuration = Math.max(2, Math.min(10, dur));
+  saveState();
+  renderAll();
+  openModal('period');
+  showToast('💾 周期设置已保存');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    renderAll();
+  }
+}
+
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  renderAll();
+}
+
+// ============ HEALTH ACTIONS ============
+function addFood() {
+  const name = document.getElementById('foodInput')?.value;
+  const cal = parseInt(document.getElementById('calInput')?.value) || 0;
+  if (name && cal > 0) {
+    state.dietLog.push({ name, cal, time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) });
+    saveState();
+    renderFoodLog();
+    renderAll();
+  }
+}
+
+function addQuickFood(name, cal) {
+  state.dietLog.push({ name, cal, time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) });
+  saveState();
+  renderFoodLog();
+  renderAll();
+  showToast('已添加 ' + name);
+}
+
+function renderFoodLog() {
+  const log = document.getElementById('foodLog');
+  if (!log) return;
+  if (state.dietLog.length === 0) {
+    log.innerHTML = '<div style="text-align:center;padding:20px;color:var(--sub);">还没有记录，快添加今天吃了什么吧~</div>';
+  } else {
+    log.innerHTML = state.dietLog.map((item, i) => `
+      <div class="food-row">
+        <span>${item.time} ${item.name}</span>
+        <span>${item.cal} kcal <span class="del" onclick="removeFood(${i})">×</span></span>
+      </div>
+    `).join('');
+  }
+  const totalEl = document.getElementById('foodTotal');
+  if (totalEl) totalEl.textContent = state.dietLog.reduce((s,i)=>s+i.cal,0);
+}
+
+function removeFood(i) {
+  state.dietLog.splice(i, 1);
+  saveState();
+  renderFoodLog();
+  renderAll();
+}
+
+function setExercise(min) {
+  state.exerciseMin = min;
+  saveState();
+  renderAll();
+  closeModalDirect();
+  showToast(min >= 30 ? '🏃 运动达标！太棒了！' : '🏃 已记录运动 ' + min + ' 分钟');
+}
+
+function setSleep(hr) {
+  state.sleepHr = hr;
+  saveState();
+  renderAll();
+  closeModalDirect();
+  showToast(hr >= 7 ? '😴 睡眠充足，继续加油！' : '😴 今晚争取早点睡哦~');
+}
+
+function addWater(cups) {
+  state.waterCups = cups;
+  saveState();
+  // refresh modal
+  openModal('water');
+  renderAll();
+}
+
+function markSelfCare() {
+  state.selfCareDone = true;
+  saveState();
+  renderAll();
+  closeModalDirect();
+  showToast('💆 今天有好好爱自己，明天也要继续！');
+}
+
+function toggleSelfCare() {
+  state.selfCareDone = !state.selfCareDone;
+  saveState();
+}
+
+// ============ UTILS ============
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  state.theme = next;
+  saveState();
+}
+
+function scrollToSection(name) {
+  const el = document.getElementById('sec-' + name);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  document.querySelectorAll('.bottom-tabs .tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.bottom-tabs .tab');
+  const names = ['trends','english','ai','health','ecom'];
+  const idx = names.indexOf(name);
+  if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  // apply theme
+  if (state.theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  renderAll();
+
+  // scroll spy
+  const scrollArea = document.getElementById('scrollArea');
+  const sections = ['trends','english','ai','health','ecom'];
+  scrollArea.addEventListener('scroll', () => {
+    let current = 'trends';
+    sections.forEach(name => {
+      const el = document.getElementById('sec-' + name);
+      if (el && el.getBoundingClientRect().top < 200) current = name;
+    });
+    document.querySelectorAll('.bottom-tabs .tab').forEach(t => t.classList.remove('active'));
+    const tabs = document.querySelectorAll('.bottom-tabs .tab');
+    const idx = sections.indexOf(current);
+    if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
+  });
+
+  // keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModalDirect();
+  });
+});
+</script>
+</body>
+</html>
